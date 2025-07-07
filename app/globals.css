@@ -1,0 +1,241 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 142 76% 36%;
+    --radius: 0.5rem;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 142 76% 36%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 142 76% 36%;
+  }
+
+  .tennis {
+    --background: 120 25% 8%;
+    --foreground: 60 30% 96%;
+    --card: 120 25% 12%;
+    --card-foreground: 60 30% 96%;
+    --popover: 120 25% 12%;
+    --popover-foreground: 60 30% 96%;
+    --primary: 48 96% 53%;
+    --primary-foreground: 120 25% 8%;
+    --secondary: 120 25% 18%;
+    --secondary-foreground: 60 30% 96%;
+    --muted: 120 25% 18%;
+    --muted-foreground: 120 10% 65%;
+    --accent: 48 96% 53%;
+    --accent-foreground: 120 25% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 60 30% 96%;
+    --border: 120 25% 25%;
+    --input: 120 25% 25%;
+    --ring: 48 96% 53%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .theme-transition {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .theme-transition-fast {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .theme-transition-border {
+    transition: border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .theme-transition-bg {
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .theme-transition-text {
+    transition: color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Match Card Shimmer Effect */
+  .match-card-shimmer {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .match-card-shimmer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsla(var(--primary), 0.1),
+      hsla(var(--primary), 0.2),
+      hsla(var(--primary), 0.1),
+      transparent
+    );
+    transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .match-card-shimmer:hover::before {
+    left: 100%;
+  }
+
+  .match-card-shimmer:hover {
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 20px hsla(var(--primary), 0.15);
+  }
+
+  /* Enhanced shimmer for accordion triggers */
+  .accordion-trigger-shimmer {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .accordion-trigger-shimmer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      hsla(var(--primary), 0.08),
+      hsla(var(--primary), 0.15),
+      hsla(var(--primary), 0.08),
+      transparent
+    );
+    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .accordion-trigger-shimmer:hover::before {
+    left: 100%;
+  }
+
+  .accordion-trigger-shimmer:hover {
+    background-color: hsla(var(--primary), 0.05);
+    border-color: hsla(var(--primary), 0.3);
+  }
+
+  /* Gold Shimmer for Tip Card */
+  .gold-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gold-shimmer::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 250%;
+    height: 250%;
+    background: conic-gradient(from 0deg, transparent 20%, #ffd70030 30%, #ffd70000 50%);
+    transform: translate(-50%, -50%);
+    animation: spin 4s linear infinite;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 0;
+  }
+
+  .gold-shimmer:hover::before {
+    opacity: 1;
+  }
+
+  @keyframes spin {
+    from {
+      transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to {
+      transform: translate(-50%, -50%) rotate(360deg);
+    }
+  }
+}
+
+/* Theme switching animation overlay */
+@keyframes theme-switch {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.theme-switch-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, hsl(var(--primary)) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 9999;
+  animation: theme-switch 0.6s ease-out;
+}
