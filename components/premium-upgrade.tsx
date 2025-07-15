@@ -4,9 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/contexts/auth-context'
 import { Crown, Loader2 } from 'lucide-react'
-import { loadStripe } from '@stripe/stripe-js'
-
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+import { getStripe } from '@/lib/stripe-client'
 
 export function PremiumUpgrade() {
   const { user } = useAuth()
@@ -30,19 +28,35 @@ export function PremiumUpgrade() {
         }),
       })
 
-      const { sessionId } = await response.json()
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to create checkout session')
+      }
+
+      const data = await response.json()
+      
+      if (!data.sessionId) {
+        throw new Error('No session ID received from server')
+      }
 
       // Redirect to Stripe Checkout
-      const stripe = await stripePromise
-      const { error } = await stripe!.redirectToCheckout({
-        sessionId,
+      const stripe = await getStripe()
+      
+      if (!stripe) {
+        throw new Error('Stripe not initialized')
+      }
+
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: data.sessionId,
       })
 
       if (error) {
         console.error('Stripe redirect error:', error)
+        throw error
       }
     } catch (error) {
       console.error('Error creating checkout session:', error)
+      // You might want to show a toast or error message to the user here
     } finally {
       setIsLoading(false)
     }

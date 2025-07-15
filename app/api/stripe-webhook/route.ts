@@ -2,20 +2,30 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { UserService } from '@/lib/user-service'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-06-30.basil'
-})
-
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!
-
 export async function POST(request: NextRequest) {
+  // Check for required environment variables
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.error('STRIPE_SECRET_KEY is not configured')
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
+  }
+
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.error('STRIPE_WEBHOOK_SECRET is not configured')
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 })
+  }
+
+  // Initialize Stripe inside the function
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-06-30.basil'
+  })
+
   const body = await request.text()
   const sig = request.headers.get('stripe-signature')!
 
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, endpointSecret)
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
     console.error('Webhook signature verification failed:', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })

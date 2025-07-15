@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-06-30.basil',
-})
-
 export async function POST(request: NextRequest) {
   try {
+    // Check for required environment variables
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('STRIPE_SECRET_KEY is not configured')
+      return NextResponse.json(
+        { error: 'Payment system is not configured' },
+        { status: 500 }
+      )
+    }
+
+    // Initialize Stripe inside the function
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-06-30.basil',
+    })
+
     const { userId, userEmail } = await request.json()
 
     if (!userId || !userEmail) {
