@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowUpRight, Bot, CheckCircle, ChevronDown, Menu, X, Youtube, Instagram } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LoginModal } from "@/components/login-modal"
 
 // X.com Icon Component
 const XIcon = ({ className }: { className?: string }) => (
@@ -353,11 +354,13 @@ export default function TennisMenacePage() {
             <XIcon className="h-5 w-5 text-muted-foreground hover:text-foreground theme-transition-text" />
           </motion.a>
           <ThemeToggle />
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button variant="outline" className="theme-transition bg-transparent">
-              Log In
-            </Button>
-          </motion.div>
+          <LoginModal>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button variant="outline" className="theme-transition bg-transparent">
+                Log In
+              </Button>
+            </motion.div>
+          </LoginModal>
         </div>
         <div className="md:hidden">
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="theme-transition">
@@ -396,9 +399,11 @@ export default function TennisMenacePage() {
                   <XIcon className="h-5 w-5" />
                   Follow on X
                 </a>
-                <Button variant="outline" className="theme-transition bg-transparent">
-                  Log In
-                </Button>
+                <LoginModal>
+                  <Button variant="outline" className="theme-transition bg-transparent">
+                    Log In
+                  </Button>
+                </LoginModal>
                 <div className="mx-auto">
                   <ThemeToggle />
                 </div>
