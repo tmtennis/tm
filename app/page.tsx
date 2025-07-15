@@ -10,7 +10,6 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { LoginModal } from "@/components/login-modal"
 import { UserDropdown } from "@/components/user-dropdown"
 import { useAuth } from "@/contexts/auth-context"
-import { PremiumContent } from "@/components/premium-content"
 
 // X.com Icon Component
 const XIcon = ({ className }: { className?: string }) => (
@@ -631,100 +630,6 @@ export default function TennisMenacePage() {
               </div>
             </div>
           </motion.div>
-        </motion.section>
-
-        {/* Premium Features Demo Section */}
-        <motion.section
-          className="py-20 md:py-32"
-          variants={sectionVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-        >
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 theme-transition-text">
-                Premium Analytics & Insights
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Unlock advanced features and detailed analytics to make more informed betting decisions.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Advanced Player Statistics */}
-              <PremiumContent>
-                <Card className="theme-transition-border theme-transition-bg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Bot className="h-5 w-5" />
-                      Advanced Player Statistics
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Surface Win Rate (Clay)</span>
-                        <span className="font-semibold">73.2%</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Return Game Success</span>
-                        <span className="font-semibold">68.5%</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">Momentum Score</span>
-                        <span className="font-semibold text-green-600">+4.2</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm">ELO Rating</span>
-                        <span className="font-semibold">2,134</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </PremiumContent>
-
-              {/* Match Predictions */}
-              <PremiumContent>
-                <Card className="theme-transition-border theme-transition-bg">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5" />
-                      Detailed Match Predictions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="p-4 bg-muted rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-semibold">Alcaraz vs Djokovic</span>
-                          <span className="text-sm text-green-600">68% confidence</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Alcaraz favored based on recent clay performance and momentum indicators.
-                        </p>
-                      </div>
-                      <div className="p-4 bg-muted rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-semibold">Set Score Prediction</span>
-                          <span className="text-sm text-blue-600">2-1</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Expecting a close three-set match with Alcaraz winning.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </PremiumContent>
-            </div>
-          </div>
         </motion.section>
 
         {/* Premium + AI Chat Section */}

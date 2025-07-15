@@ -53,7 +53,7 @@ describe('PremiumContent', () => {
     expect(screen.queryByText('Premium content')).not.toBeInTheDocument()
   })
 
-  it('shows sign in prompt for unauthenticated users', () => {
+  it('shows nothing for unauthenticated users', () => {
     mockUseAuth.mockReturnValue({
       user: null,
       userData: null,
@@ -63,13 +63,13 @@ describe('PremiumContent', () => {
       refreshUserData: jest.fn()
     })
 
-    render(
+    const { container } = render(
       <PremiumContent>
         <div>Premium content</div>
       </PremiumContent>
     )
 
-    expect(screen.getByText('Please sign in to access this content')).toBeInTheDocument()
+    expect(container.firstChild).toBeNull()
     expect(screen.queryByText('Premium content')).not.toBeInTheDocument()
   })
 

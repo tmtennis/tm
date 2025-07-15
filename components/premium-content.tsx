@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/auth-context'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Lock, Crown, Star } from 'lucide-react'
+import { Crown, Star } from 'lucide-react'
 import { PremiumUpgrade } from '@/components/premium-upgrade'
 
 interface PremiumContentProps {
@@ -21,14 +21,7 @@ export function PremiumContent({ children, fallback, showUpgrade = true }: Premi
   }
 
   if (!user) {
-    return fallback || (
-      <Card className="border-2 border-dashed border-gray-300">
-        <CardContent className="flex flex-col items-center justify-center py-8">
-          <Lock className="h-12 w-12 text-gray-400 mb-4" />
-          <p className="text-gray-500 text-center">Please sign in to access this content</p>
-        </CardContent>
-      </Card>
-    )
+    return fallback || null
   }
 
   if (isPremium) {
