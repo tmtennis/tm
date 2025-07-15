@@ -10,9 +10,14 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 }
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig)
+// Initialize Firebase only on client side
+let app: any = null
+let auth: any = null
 
-// Initialize Firebase Authentication and get a reference to the service
-export const auth = getAuth(app)
+if (typeof window !== 'undefined') {
+  app = initializeApp(firebaseConfig)
+  auth = getAuth(app)
+}
+
+export { auth }
 export default app

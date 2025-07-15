@@ -40,6 +40,12 @@ export function LoginModal({ children }: LoginModalProps) {
     setIsLoading(true)
     setError("")
     
+    if (!auth) {
+      setError("Authentication service is not available")
+      setIsLoading(false)
+      return
+    }
+    
     try {
       if (isLogin) {
         // Sign in existing user
@@ -71,6 +77,12 @@ export function LoginModal({ children }: LoginModalProps) {
     setIsLoading(true)
     setError("")
     
+    if (!auth) {
+      setError("Authentication service is not available")
+      setIsLoading(false)
+      return
+    }
+    
     try {
       const provider = new GoogleAuthProvider()
       await signInWithPopup(auth, provider)
@@ -87,6 +99,11 @@ export function LoginModal({ children }: LoginModalProps) {
   const handlePasswordReset = async () => {
     if (!formData.email) {
       setError("Please enter your email address first")
+      return
+    }
+    
+    if (!auth) {
+      setError("Authentication service is not available")
       return
     }
     
