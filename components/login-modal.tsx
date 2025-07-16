@@ -11,12 +11,11 @@ import { Eye, EyeOff, Mail, Lock, User } from "lucide-react"
 import { 
   createUserWithEmailAndPassword, 
   signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
   sendPasswordResetEmail,
   updateProfile
 } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import googleAuthLogin from '@/lib/google-auth'
 
 interface LoginModalProps {
   children: React.ReactNode
@@ -39,12 +38,6 @@ export function LoginModal({ children }: LoginModalProps) {
     e.preventDefault()
     setIsLoading(true)
     setError("")
-    
-    if (!auth) {
-      setError("Authentication service is not available")
-      setIsLoading(false)
-      return
-    }
     
     try {
       if (isLogin) {
@@ -77,17 +70,14 @@ export function LoginModal({ children }: LoginModalProps) {
     setIsLoading(true)
     setError("")
     
-    if (!auth) {
-      setError("Authentication service is not available")
-      setIsLoading(false)
-      return
-    }
-    
     try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
-      setIsOpen(false)
-      setFormData({ email: "", password: "", confirmPassword: "", name: "" })
+      const result = await googleAuthLogin()
+      if (result.success) {
+        setIsOpen(false)
+        setFormData({ email: "", password: "", confirmPassword: "", name: "" })
+      } else {
+        setError(result.error || "An error occurred during Google sign-in")
+      }
     } catch (error: any) {
       console.error("Google login error:", error)
       setError(error.message || "An error occurred during Google sign-in")
@@ -99,11 +89,6 @@ export function LoginModal({ children }: LoginModalProps) {
   const handlePasswordReset = async () => {
     if (!formData.email) {
       setError("Please enter your email address first")
-      return
-    }
-    
-    if (!auth) {
-      setError("Authentication service is not available")
       return
     }
     
