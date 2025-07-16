@@ -7,7 +7,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User, Settings, LogOut, Crown } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
-import { PremiumUpgrade } from "./premium-upgrade"
 import { PremiumBadge } from "./premium-content"
 
 export function UserDropdown() {
@@ -66,17 +65,9 @@ export function UserDropdown() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {!isPremium && (
-          <>
-            <div className="px-2 py-1">
-              <PremiumUpgrade />
-            </div>
-            <DropdownMenuSeparator />
-          </>
-        )}
         <DropdownMenuItem className="cursor-pointer">
           <Crown className="mr-2 h-4 w-4" />
-          <span>Premium</span>
+          <span className="theme-transition-text">Premium</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" />
