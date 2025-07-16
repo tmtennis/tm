@@ -1,6 +1,7 @@
-// Updated Firebase configuration to use environment variables and prevent multiple initializations
+// Updated Firebase configuration to ensure proper initialization and export auth instance
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 
 // Firebase configuration using environment variables
@@ -14,9 +15,6 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Log environment variables for debugging in production
-console.log("Firebase Config:", firebaseConfig);
-
 // Prevent multiple initializations
 const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
@@ -25,7 +23,8 @@ if (typeof window !== "undefined") {
   getAnalytics(app);
 }
 
-// Initialize Firestore
+// Initialize Firebase services
+const auth = getAuth(app);
 const db = getFirestore(app);
 
-export { app, db };
+export { app, auth, db };
