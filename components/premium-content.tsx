@@ -6,6 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Crown, Star } from 'lucide-react'
 import { PremiumUpgrade } from '@/components/premium-upgrade'
+import { useState, useEffect } from 'react'
+import { doc, getDoc, DocumentData } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 
 interface PremiumContentProps {
   children: React.ReactNode
@@ -15,9 +18,40 @@ interface PremiumContentProps {
 
 export function PremiumContent({ children, fallback, showUpgrade = true }: PremiumContentProps) {
   const { isPremium, user, loading } = useAuth()
+  const [data, setData] = useState<DocumentData | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  if (loading) {
+  useEffect(() => {
+    if (!user) return
+
+    const fetchData = async () => {
+      setIsLoading(true)
+      try {
+        const docRef = doc(db, 'premiumContent', user.uid)
+        const docSnap = await getDoc(docRef)
+        if (docSnap.exists()) {
+          setData(docSnap.data())
+        } else {
+          setData(null)
+        }
+      } catch (err) {
+        console.error('Error fetching premium content:', err)
+        setError(String(err))
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [user])
+
+  if (loading || isLoading) {
     return <div className="animate-pulse bg-gray-200 rounded-lg h-32" />
+  }
+
+  if (error) {
+    return <div>Error loading data</div>
   }
 
   if (!user) {
