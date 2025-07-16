@@ -31,6 +31,7 @@ export const useAuth = () => {
   return context
 }
 
+// Updated AuthProvider to prevent rendering until Firebase finishes loading
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [userData, setUserData] = useState<UserData | null>(null)
@@ -51,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    if (!auth) {
+    if (typeof window === 'undefined' || !auth) {
       setLoading(false)
       return
     }
@@ -109,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   )
 }
