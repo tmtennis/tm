@@ -10,6 +10,7 @@ interface AuthContextType {
   userData: UserData | null
   isPremium: boolean
   loading: boolean
+  authChecked: boolean
   logout: () => Promise<void>
   refreshUserData: () => Promise<void>
 }
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({
   userData: null,
   isPremium: false,
   loading: true,
+  authChecked: false,
   logout: async () => {},
   refreshUserData: async () => {}
 })
@@ -31,11 +33,12 @@ export const useAuth = () => {
   return context
 }
 
-// Updated AuthProvider to prevent rendering until Firebase finishes loading
+// Updated AuthProvider to include authChecked state and delay rendering until Firebase initializes
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [userData, setUserData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [authChecked, setAuthChecked] = useState(false)
 
   const refreshUserData = async () => {
     if (user) {
@@ -54,6 +57,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined' || !auth) {
       setLoading(false)
+      setAuthChecked(true)
       return
     }
 
@@ -84,8 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUserData(null)
       }
-      
       setLoading(false)
+      setAuthChecked(true)
     })
 
     return unsubscribe
@@ -104,13 +108,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     userData,
     isPremium: userData?.isPremium || false,
     loading,
+    authChecked,
     logout,
     refreshUserData
   }
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {authChecked ? children : <div className="flex items-center justify-center min-h-screen">Loading...</div>}
     </AuthContext.Provider>
   )
 }
