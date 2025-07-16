@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider value={value}>
-      {authChecked ? children : <div className="flex items-center justify-center min-h-screen">Loading...</div>}
+      {children}
     </AuthContext.Provider>
   )
 }
