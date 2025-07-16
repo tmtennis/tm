@@ -61,15 +61,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
+    const timeout = setTimeout(() => {
+      console.error('Firebase auth initialization timeout. Signing out.')
+      logout()
+      window.location.reload()
+    }, 5000)
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      clearTimeout(timeout)
       setUser(user)
-      
+
       if (user) {
         try {
-          // Check if user exists in Firestore
           let userData = await UserService.getUser(user.uid)
-          
-          // If user doesn't exist, create them
+
           if (!userData) {
             await UserService.createUser({
               uid: user.uid,
@@ -79,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
             userData = await UserService.getUser(user.uid)
           }
-          
+
           setUserData(userData)
         } catch (error) {
           console.error('Error handling user data:', error)
@@ -92,7 +97,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setAuthChecked(true)
     })
 
-    return unsubscribe
+    return () => {
+      clearTimeout(timeout)
+      unsubscribe()
+    }
   }, [])
 
   const logout = async () => {
