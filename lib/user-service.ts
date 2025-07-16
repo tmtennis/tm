@@ -32,23 +32,29 @@ export class UserService {
     await setDoc(userDoc, data)
   }
 
+  // Wrap Firestore queries in try/catch to handle errors
   static async getUser(uid: string): Promise<UserData | null> {
     if (!db || !uid) return null
 
-    const userDoc = doc(db, this.COLLECTION_NAME, uid)
-    const docSnap = await getDoc(userDoc)
+    try {
+      const userDoc = doc(db, this.COLLECTION_NAME, uid)
+      const docSnap = await getDoc(userDoc)
 
-    if (docSnap.exists()) {
-      const data = docSnap.data()
-      return {
-        ...data,
-        createdAt: data.createdAt?.toDate() || new Date(),
-        updatedAt: data.updatedAt?.toDate() || new Date(),
-        subscriptionEndDate: data.subscriptionEndDate?.toDate()
-      } as UserData
+      if (docSnap.exists()) {
+        const data = docSnap.data()
+        return {
+          ...data,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+          subscriptionEndDate: data.subscriptionEndDate?.toDate()
+        } as UserData
+      }
+
+      return null
+    } catch (error) {
+      console.error("Error fetching user data:", error)
+      return null
     }
-
-    return null
   }
 
   static async updateUser(uid: string, updates: Partial<UserData>): Promise<void> {

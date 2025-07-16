@@ -27,4 +27,9 @@ if (typeof window !== "undefined") {
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Add production console log for Firebase config
+if (process.env.NODE_ENV === "production") {
+  console.log("Firebase config:", firebaseConfig);
+}
+
 export { app, auth, db };
