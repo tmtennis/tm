@@ -200,118 +200,73 @@ export default function TennisMenacePage() {
     sequence()
   }, [aiChatAnimationStarted])
 
-  const sectionVariants = {
-    hidden: { opacity: 0, y: 80 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] } },
-  }
-
   const textVariants = {
-    enter: {
-      opacity: 0,
-      y: 30,
-      filter: "blur(6px)",
-    },
+    enter: { opacity: 0, y: 20, filter: "blur(10px)" },
     center: {
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
-      transition: {
-        duration: 1.0,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
+      transition: { duration: 1, ease: "easeOut" },
     },
     exit: {
       opacity: 0,
-      y: -30,
-      filter: "blur(6px)",
-      transition: {
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
+      y: -20,
+      filter: "blur(10px)",
+      transition: { duration: 1, ease: "easeIn" },
+    },
+  }
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 1, ease: "easeOut" },
     },
   }
 
   const statVariants = {
-    enter: {
-      opacity: 0,
-      y: 25,
-      filter: "blur(4px)",
-    },
+    enter: { opacity: 0, y: 20, filter: "blur(10px)" },
     center: {
       opacity: 1,
       y: 0,
       filter: "blur(0px)",
-      transition: {
-        duration: 0.9,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
+      transition: { duration: 1, ease: "easeOut" },
     },
     exit: {
       opacity: 0,
-      y: -25,
-      filter: "blur(4px)",
-      transition: {
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
+      y: -20,
+      filter: "blur(10px)",
+      transition: { duration: 1, ease: "easeIn" },
     },
   }
 
   const featureVariants = {
-    enter: {
-      opacity: 0,
-      x: 30,
-      filter: "blur(3px)",
-    },
+    enter: { opacity: 0, x: -20, filter: "blur(10px)" },
     center: {
       opacity: 1,
       x: 0,
       filter: "blur(0px)",
-      transition: {
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
+      transition: { duration: 1, ease: "easeOut" },
     },
     exit: {
       opacity: 0,
-      x: -30,
-      filter: "blur(3px)",
-      transition: {
-        duration: 0.7,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      },
+      x: 20,
+      filter: "blur(10px)",
+      transition: { duration: 1, ease: "easeIn" },
     },
   }
 
-  // Article animation variants
-  const getArticleVariants = (index: number) => {
-    if (shouldReduceMotion) {
-      return {
-        hidden: { opacity: 0 },
-        visible: { opacity: 1 },
-      }
-    }
-
-    return {
-      hidden: {
-        opacity: 0,
-        x: isMobile ? 0 : -100,
-        y: isMobile ? 50 : 0,
-        filter: "blur(6px)",
-      },
-      visible: {
-        opacity: 1,
-        x: 0,
-        y: 0,
-        filter: "blur(0px)",
-        transition: {
-          duration: 0.8,
-          delay: index * 0.2,
-          ease: [0.25, 0.46, 0.45, 0.94],
-        },
-      },
-    }
-  }
+  const getArticleVariants = (index: number) => ({
+    hidden: { opacity: 0, x: -20, y: 20, filter: "blur(10px)" },
+    visible: {
+      opacity: 1,
+      x: 0,
+      y: 0,
+      filter: "blur(0px)",
+      transition: { duration: 1, delay: index * 0.2, ease: "easeOut" },
+    },
+  })
 
   const navLinks = [
     { href: "#picks", label: "Daily Picks" },
@@ -437,53 +392,32 @@ export default function TennisMenacePage() {
 
       <main className="px-4 md:px-8">
         {/* Hero Section */}
-        <section className="min-h-screen flex flex-col justify-center items-center text-center -mt-16 relative">
-          <div className="relative">
+        <section className="min-h-screen flex flex-col justify-center items-center text-center">
+          <div className="relative h-32 flex items-center justify-center">
+            {/* Pre-title animation */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              animate={{ opacity: 0, scale: 0.95, filter: "blur(8px)" }}
+              transition={{ duration: 1.0, delay: 2.0, ease: "easeInOut" }}
+            >
+              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none">
+                <span className="text-foreground">make your own </span>
+                <span className="text-primary">judgement</span>
+              </h1>
+            </motion.div>
+
             {/* Clean TennisMenace Title with smooth animations */}
             <motion.div
-              className="relative"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0, scale: 1.05, filter: "blur(8px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              transition={{ duration: 1.0, delay: 3.0, ease: "easeInOut" }}
             >
-              <motion.h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none">
-                <motion.span
-                  className="inline-block text-foreground theme-transition-text"
-                  initial={{ opacity: 0, y: 60, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{
-                    duration: 1.0,
-                    delay: 0.4,
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                  }}
-                >
-                  tennis
-                </motion.span>
-                <motion.span
-                  className="inline-block text-primary theme-transition-text"
-                  initial={{ opacity: 0, y: 60, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{
-                    duration: 1.0,
-                    delay: 0.7,
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                  }}
-                >
-                  menace
-                </motion.span>
-              </motion.h1>
-
-              {/* Subtle background glow */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/8 to-transparent blur-3xl -z-10"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1.2 }}
-                transition={{
-                  duration: 1.5,
-                  delay: 1.2,
-                  ease: "easeOut",
-                }}
-              />
+              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none">
+                <span className="text-foreground">tennis</span>
+                <span className="text-primary">menace</span>
+              </h1>
             </motion.div>
           </div>
 
@@ -491,7 +425,7 @@ export default function TennisMenacePage() {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.5 }}
+            transition={{ duration: 0.8, delay: 4.0 }}
             className="mt-8 h-20 md:h-16 flex items-center justify-center max-w-4xl"
           >
             <AnimatePresence mode="wait">
@@ -501,31 +435,21 @@ export default function TennisMenacePage() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="text-lg md:text-xl text-muted-foreground theme-transition-text text-center leading-relaxed font-light"
+                className="text-lg md:text-xl text-muted-foreground"
               >
                 {rotatingTexts[currentTextIndex]}
               </motion.p>
             </AnimatePresence>
           </motion.div>
 
+          {/* Scroll Down Indicator */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 2.0 }}
-            className="mt-12"
+            transition={{ duration: 0.8, delay: 4.5 }}
+            className="absolute bottom-10"
           >
-            <motion.a href="#picks" whileHover={{ y: -5 }} transition={{ type: "spring", stiffness: 400, damping: 10 }}>
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{
-                  duration: 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut",
-                }}
-              >
-                <ChevronDown className="h-8 w-8 text-muted-foreground hover:text-primary theme-transition-text transition-colors duration-300" />
-              </motion.div>
-            </motion.a>
+            <ChevronDown className="h-8 w-8 text-muted-foreground animate-bounce" />
           </motion.div>
         </section>
 
@@ -596,7 +520,7 @@ export default function TennisMenacePage() {
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.8, delay: 0.3, ease: "easeInOut" }}
             viewport={{ once: true }}
             className="mt-12"
           >
