@@ -479,29 +479,29 @@ export default function PlayerSearch() {
       <Card className="hover:shadow-lg transition-all duration-300 theme-transition-bg theme-transition-border border-primary/20 hover:border-primary/40 overflow-hidden">
         <CardContent className="p-0">
           {/* Header section with rank and name */}
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 border-b border-primary/10">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
+          <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-3 border-b border-primary/10">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
                 {/* Rank Badge - Removed ELO badge overlay */}
-                <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-bold text-sm border-2 border-green-700">
+                <div className="w-9 h-9 rounded-full bg-green-600 flex items-center justify-center text-white font-bold text-xs border-2 border-green-700">
                   #{player.rank}
                 </div>
                 <div className="min-w-0">
-                  <h3 className="text-lg font-bold text-foreground truncate mb-1">
+                  <h3 className="text-base font-bold text-foreground truncate mb-0.5">
                     {player.name}
                   </h3>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 px-2 py-0.5">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30 px-1.5 py-0.5 text-xs">
                       {player.country}
                     </Badge>
                     <span>Age {player.age}</span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <div className="text-right">
-                  <div className="text-sm text-muted-foreground">ATP Points</div>
-                  <div className="text-lg font-bold text-primary">
+                  <div className="text-xs text-muted-foreground">ATP Points</div>
+                  <div className="text-base font-bold text-primary">
                     {parseInt(player.points).toLocaleString()}
                   </div>
                 </div>
@@ -511,24 +511,24 @@ export default function PlayerSearch() {
                     variant={isPlayerPinned(player.name) ? "default" : "outline"}
                     onClick={() => isPlayerPinned(player.name) ? handleUnpinPlayer(player.name) : handlePinPlayer(player)}
                     disabled={!isPlayerPinned(player.name) && pinnedPlayers.length >= 3}
-                    className="h-8 w-8 p-0"
+                    className="h-7 w-7 p-0"
                   >
                     {isPlayerPinned(player.name) ? (
-                      <X className="h-4 w-4" />
+                      <X className="h-3 w-3" />
                     ) : (
-                      <Pin className="h-4 w-4" />
+                      <Pin className="h-3 w-3" />
                     )}
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={onToggleExpansion}
-                    className="h-8 w-8 p-0"
+                    className="h-7 w-7 p-0"
                   >
                     {isExpanded ? (
-                      <ChevronUp className="h-4 w-4" />
+                      <ChevronUp className="h-3 w-3" />
                     ) : (
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className="h-3 w-3" />
                     )}
                   </Button>
                 </div>
@@ -538,12 +538,12 @@ export default function PlayerSearch() {
 
           {/* Collapsible ELO Stats Section */}
           {isExpanded && player.elo && (
-            <div className="p-3 space-y-2">
+            <div className="p-2 space-y-1.5">
               {/* Current ELO - Compact */}
-              <div className="bg-muted/30 rounded p-2">
-                <div className="flex items-center justify-between mb-2">
+              <div className="bg-muted/10 rounded p-1.5">
+                <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium text-muted-foreground">Current ELO</span>
-                  <span className="text-lg font-bold text-blue-500">
+                  <span className="text-base font-bold text-blue-500">
                     {parseFloat(player.elo).toFixed(1)}
                   </span>
                 </div>
@@ -551,21 +551,21 @@ export default function PlayerSearch() {
                 {/* Surface ELO breakdown - More compact */}
                 <div className="grid grid-cols-3 gap-1">
                   {player.clayElo && (
-                    <div className="text-center p-1 bg-orange-50 dark:bg-orange-950/20 rounded text-xs">
+                    <div className="text-center p-1 bg-orange-500/10 dark:bg-orange-500/20 rounded text-xs">
                       <div className="font-bold text-orange-600">{Math.round(parseFloat(player.clayElo))}</div>
-                      <div className="text-muted-foreground">Clay</div>
+                      <div className="text-muted-foreground text-[10px]">Clay</div>
                     </div>
                   )}
                   {player.hardcourtElo && (
-                    <div className="text-center p-1 bg-gray-50 dark:bg-gray-950/20 rounded text-xs">
-                      <div className="font-bold text-gray-600">{Math.round(parseFloat(player.hardcourtElo))}</div>
-                      <div className="text-muted-foreground">Hard</div>
+                    <div className="text-center p-1 bg-blue-500/10 dark:bg-blue-500/20 rounded text-xs">
+                      <div className="font-bold text-blue-600 dark:text-blue-400">{Math.round(parseFloat(player.hardcourtElo))}</div>
+                      <div className="text-muted-foreground text-[10px]">Hard</div>
                     </div>
                   )}
                   {player.grassElo && (
-                    <div className="text-center p-1 bg-green-50 dark:bg-green-950/20 rounded text-xs">
+                    <div className="text-center p-1 bg-green-500/10 dark:bg-green-500/20 rounded text-xs">
                       <div className="font-bold text-green-600">{Math.round(parseFloat(player.grassElo))}</div>
-                      <div className="text-muted-foreground">Grass</div>
+                      <div className="text-muted-foreground text-[10px]">Grass</div>
                     </div>
                   )}
                 </div>
@@ -573,7 +573,7 @@ export default function PlayerSearch() {
 
               {/* Peak ELO - More compact */}
               {player.peakElo && (
-                <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 rounded p-2 border border-amber-200/50 dark:border-amber-800/30">
+                <div className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 dark:from-amber-500/20 dark:to-yellow-500/20 rounded p-1.5 border border-amber-200/50 dark:border-amber-800/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1">
                       <Award className="h-3 w-3 text-amber-500" />
@@ -584,7 +584,7 @@ export default function PlayerSearch() {
                         {parseFloat(player.peakElo).toFixed(1)}
                       </div>
                       {player.peakMonth && (
-                        <div className="text-xs text-amber-600/70 dark:text-amber-400/70">
+                        <div className="text-[10px] text-amber-600/70 dark:text-amber-400/70">
                           {player.peakMonth}
                         </div>
                       )}
@@ -597,14 +597,14 @@ export default function PlayerSearch() {
 
           {/* 2024 Season Stats Section */}
           {isExpanded && player.stats2024 && (
-            <div className="p-3 border-t border-muted/20">
-              <div className="mb-2">
+            <div className="p-2 border-t border-muted/20">
+              <div className="mb-1">
                 <span className="text-xs font-medium text-blue-600">2024 Season Stats</span>
               </div>
               
               {/* W/L Record */}
-              <div className="bg-muted/30 rounded p-2 mb-2">
-                <div className="flex items-center justify-between mb-2">
+              <div className="bg-muted/10 rounded p-1.5 mb-1">
+                <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-medium text-muted-foreground">Record</span>
                   <span className="text-sm font-bold text-foreground">
                     {player.stats2024.totalWins}W-{player.stats2024.totalLosses}L
@@ -612,42 +612,42 @@ export default function PlayerSearch() {
                 </div>
                 
                 {/* Win percentage */}
-                <div className="text-xs text-muted-foreground">
+                <div className="text-[10px] text-muted-foreground">
                   Win Rate: {((player.stats2024.totalWins / (player.stats2024.totalWins + player.stats2024.totalLosses)) * 100).toFixed(1)}%
                 </div>
               </div>
 
               {/* Streaks */}
-              <div className="grid grid-cols-2 gap-2 mb-2">
-                <div className="text-center p-2 bg-green-50 dark:bg-green-950/20 rounded text-xs">
+              <div className="grid grid-cols-2 gap-1 mb-1">
+                <div className="text-center p-1.5 bg-green-500/10 dark:bg-green-500/20 rounded text-xs">
                   <div className="font-bold text-green-600">{player.stats2024.longestWinStreak}</div>
-                  <div className="text-muted-foreground">Best Win Streak</div>
+                  <div className="text-muted-foreground text-[10px]">Best Win Streak</div>
                 </div>
-                <div className="text-center p-2 bg-red-50 dark:bg-red-950/20 rounded text-xs">
+                <div className="text-center p-1.5 bg-red-500/10 dark:bg-red-500/20 rounded text-xs">
                   <div className="font-bold text-red-600">{player.stats2024.longestLoseStreak}</div>
-                  <div className="text-muted-foreground">Worst Lose Streak</div>
+                  <div className="text-muted-foreground text-[10px]">Worst Lose Streak</div>
                 </div>
               </div>
 
               {/* Surface Stats */}
               <div className="grid grid-cols-3 gap-1">
-                <div className="text-center p-1 bg-orange-50 dark:bg-orange-950/20 rounded text-xs">
+                <div className="text-center p-1 bg-orange-500/10 dark:bg-orange-500/20 rounded text-xs">
                   <div className="font-bold text-orange-600">
                     {player.stats2024.surfaceStats.Clay.wins}-{player.stats2024.surfaceStats.Clay.losses}
                   </div>
-                  <div className="text-muted-foreground">Clay</div>
+                  <div className="text-muted-foreground text-[10px]">Clay</div>
                 </div>
-                <div className="text-center p-1 bg-gray-50 dark:bg-gray-950/20 rounded text-xs">
-                  <div className="font-bold text-gray-600">
+                <div className="text-center p-1 bg-blue-500/10 dark:bg-blue-500/20 rounded text-xs">
+                  <div className="font-bold text-blue-600 dark:text-blue-400">
                     {player.stats2024.surfaceStats.Hard.wins}-{player.stats2024.surfaceStats.Hard.losses}
                   </div>
-                  <div className="text-muted-foreground">Hard</div>
+                  <div className="text-muted-foreground text-[10px]">Hard</div>
                 </div>
-                <div className="text-center p-1 bg-green-50 dark:bg-green-950/20 rounded text-xs">
+                <div className="text-center p-1 bg-green-500/10 dark:bg-green-500/20 rounded text-xs">
                   <div className="font-bold text-green-600">
                     {player.stats2024.surfaceStats.Grass.wins}-{player.stats2024.surfaceStats.Grass.losses}
                   </div>
-                  <div className="text-muted-foreground">Grass</div>
+                  <div className="text-muted-foreground text-[10px]">Grass</div>
                 </div>
               </div>
             </div>
@@ -835,7 +835,7 @@ export default function PlayerSearch() {
           {/* Right side - Pinned Players */}
           <div className="lg:col-span-2">
             <div className="sticky top-4">
-              <Card className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border-2 border-green-300/50 dark:border-green-700/50 rounded-3xl">
+              <Card className="bg-green-900/10 dark:bg-green-900/20 backdrop-blur-md border-2 border-green-300/50 dark:border-green-700/50 rounded-3xl">
                 <CardContent className="p-6 rounded-3xl">
                   {/* Header with Navigation Buttons */}
                   <div className="flex items-center justify-between mb-6">
@@ -844,14 +844,14 @@ export default function PlayerSearch() {
                         <Target className="h-5 w-5 text-green-600 dark:text-green-400" />
                       </div>
                       <h3 className="text-xl font-bold text-foreground">Pinned Players</h3>
-                      <Badge variant="secondary" className="text-sm px-3 py-1 bg-green-50/80 dark:bg-green-900/30 border border-green-300/50 dark:border-green-700/50">{pinnedPlayers.length}/3</Badge>
+                      <Badge variant="secondary" className="text-sm px-3 py-1 bg-green-500/10 dark:bg-green-500/20 border border-green-300/50 dark:border-green-700/50">{pinnedPlayers.length}/3</Badge>
                     </div>
                     {pinnedPlayers.length > 0 && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={handleClearPinned}
-                        className="bg-red-50/80 dark:bg-red-900/30 border border-red-300/50 dark:border-red-700/50 hover:bg-red-100/80 dark:hover:bg-red-900/50"
+                        className="bg-red-500/10 dark:bg-red-500/20 border border-red-300/50 dark:border-red-700/50 hover:bg-red-500/20 dark:hover:bg-red-500/30"
                       >
                         <X className="h-4 w-4 mr-1" />
                         Clear
@@ -866,7 +866,7 @@ export default function PlayerSearch() {
                         variant={currentView === 'list' ? "default" : "ghost"}
                         size="sm"
                         onClick={() => setCurrentView('list')}
-                        className={`flex items-center gap-2 text-xs ${currentView === 'list' ? 'bg-green-500/80 hover:bg-green-600/80 text-white' : 'bg-green-50/80 dark:bg-green-900/30 border border-green-300/50 dark:border-green-700/50 hover:bg-green-100/80 dark:hover:bg-green-900/50'}`}
+                        className={`flex items-center gap-2 text-xs ${currentView === 'list' ? 'bg-green-500/80 hover:bg-green-600/80 text-white' : 'bg-green-500/10 dark:bg-green-500/20 border border-green-300/50 dark:border-green-700/50 hover:bg-green-500/20 dark:hover:bg-green-500/30'}`}
                       >
                         <Target className="h-3 w-3" />
                         Players
@@ -876,7 +876,7 @@ export default function PlayerSearch() {
                         variant={currentView === 'details' ? "default" : "ghost"}
                         size="sm"
                         onClick={() => setCurrentView('details')}
-                        className={`flex items-center gap-2 text-xs ${currentView === 'details' ? 'bg-green-500/80 hover:bg-green-600/80 text-white' : 'bg-green-50/80 dark:bg-green-900/30 border border-green-300/50 dark:border-green-700/50 hover:bg-green-100/80 dark:hover:bg-green-900/50'}`}
+                        className={`flex items-center gap-2 text-xs ${currentView === 'details' ? 'bg-green-500/80 hover:bg-green-600/80 text-white' : 'bg-green-500/10 dark:bg-green-500/20 border border-green-300/50 dark:border-green-700/50 hover:bg-green-500/20 dark:hover:bg-green-500/30'}`}
                       >
                         <BarChart3 className="h-3 w-3" />
                         Details
@@ -887,7 +887,7 @@ export default function PlayerSearch() {
                           variant={currentView === 'h2h' ? "default" : "ghost"}
                           size="sm"
                           onClick={() => setCurrentView('h2h')}
-                          className={`flex items-center gap-2 text-xs ${currentView === 'h2h' ? 'bg-green-500/80 hover:bg-green-600/80 text-white' : 'bg-green-50/80 dark:bg-green-900/30 border border-green-300/50 dark:border-green-700/50 hover:bg-green-100/80 dark:hover:bg-green-900/50'}`}
+                          className={`flex items-center gap-2 text-xs ${currentView === 'h2h' ? 'bg-green-500/80 hover:bg-green-600/80 text-white' : 'bg-green-500/10 dark:bg-green-500/20 border border-green-300/50 dark:border-green-700/50 hover:bg-green-500/20 dark:hover:bg-green-500/30'}`}
                         >
                           <Swords className="h-3 w-3" />
                           H2H
@@ -910,9 +910,9 @@ export default function PlayerSearch() {
                       {currentView === 'list' && (
                         <div className="space-y-3 animate-in fade-in duration-200">
                           {pinnedPlayers.map((player, index) => (
-                            <div key={index} className="flex items-center justify-between p-4 bg-white/50 dark:bg-gray-800/30 rounded-2xl border border-green-200/50 dark:border-green-700/30 hover:border-green-400/50 transition-all duration-200">
+                            <div key={index} className="flex items-center justify-between p-4 bg-green-500/5 dark:bg-green-500/10 rounded-2xl border border-green-200/30 dark:border-green-700/30 hover:border-green-400/50 transition-all duration-200">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-green-100/80 dark:bg-green-900/40 border border-green-300/50 dark:border-green-700/50 flex items-center justify-center text-green-600 dark:text-green-400 font-bold text-sm">
+                                <div className="w-10 h-10 rounded-full bg-green-500/15 dark:bg-green-500/25 border border-green-300/50 dark:border-green-700/50 flex items-center justify-center text-green-600 dark:text-green-400 font-bold text-sm">
                                   #{player.rank}
                                 </div>
                                 <div>
@@ -924,7 +924,7 @@ export default function PlayerSearch() {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => handleUnpinPlayer(player.name)}
-                                className="h-8 w-8 p-0 bg-red-50/80 dark:bg-red-900/30 hover:bg-red-100/80 dark:hover:bg-red-900/50 hover:text-red-600 dark:hover:text-red-400 border border-red-300/50 dark:border-red-700/50 hover:border-red-400/70 rounded-lg transition-all duration-200"
+                                className="h-8 w-8 p-0 bg-red-500/10 dark:bg-red-500/20 hover:bg-red-500/20 dark:hover:bg-red-500/30 hover:text-red-600 dark:hover:text-red-400 border border-red-300/50 dark:border-red-700/50 hover:border-red-400/70 rounded-lg transition-all duration-200"
                               >
                                 <X className="h-4 w-4" />
                               </Button>
@@ -936,7 +936,7 @@ export default function PlayerSearch() {
                       {/* Details Tab Content */}
                       {currentView === 'details' && (
                         <div className="animate-in fade-in duration-200">
-                          <div className="bg-white/50 dark:bg-gray-800/30 rounded-2xl p-4 border border-green-200/50 dark:border-green-700/30">
+                          <div className="bg-green-500/5 dark:bg-green-500/10 rounded-2xl p-4 border border-green-200/30 dark:border-green-700/30">
                             <h4 className="font-semibold mb-3 text-sm flex items-center gap-2">
                               <BarChart3 className="h-4 w-4" />
                               Comparison Overview
