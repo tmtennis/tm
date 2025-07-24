@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { LoginModal } from "@/components/login-modal"
 import { UserDropdown } from "@/components/user-dropdown"
 import { useAuth } from "@/contexts/auth-context"
+import PlayerSearch from '@/components/PlayerSearch';
 
 // X.com Icon Component
 const XIcon = ({ className }: { className?: string }) => (
@@ -202,72 +203,33 @@ export default function TennisMenacePage() {
 
   const textVariants = {
     enter: { opacity: 0, y: 20, filter: "blur(10px)" },
-    center: {
-      opacity: 1,
-      y: 0,
-      filter: "blur(0px)",
-      transition: { duration: 1, ease: "easeOut" },
-    },
-    exit: {
-      opacity: 0,
-      y: -20,
-      filter: "blur(10px)",
-      transition: { duration: 1, ease: "easeIn" },
-    },
+    center: { opacity: 1, y: 0, filter: "blur(0px)" },
+    exit: { opacity: 0, y: -20, filter: "blur(10px)" },
   }
 
   const sectionVariants = {
     hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 1, ease: "easeOut" },
-    },
+    visible: { opacity: 1, y: 0 },
   }
 
   const statVariants = {
     enter: { opacity: 0, y: 20, filter: "blur(10px)" },
-    center: {
-      opacity: 1,
-      y: 0,
-      filter: "blur(0px)",
-      transition: { duration: 1, ease: "easeOut" },
-    },
-    exit: {
-      opacity: 0,
-      y: -20,
-      filter: "blur(10px)",
-      transition: { duration: 1, ease: "easeIn" },
-    },
+    center: { opacity: 1, y: 0, filter: "blur(0px)" },
+    exit: { opacity: 0, y: -20, filter: "blur(10px)" },
   }
 
   const featureVariants = {
     enter: { opacity: 0, x: -20, filter: "blur(10px)" },
-    center: {
-      opacity: 1,
-      x: 0,
-      filter: "blur(0px)",
-      transition: { duration: 1, ease: "easeOut" },
-    },
-    exit: {
-      opacity: 0,
-      x: 20,
-      filter: "blur(10px)",
-      transition: { duration: 1, ease: "easeIn" },
-    },
+    center: { opacity: 1, x: 0, filter: "blur(0px)" },
+    exit: { opacity: 0, x: 20, filter: "blur(10px)" },
   }
 
   const getArticleVariants = (index: number) => ({
     hidden: { opacity: 0, x: -20, y: 20, filter: "blur(10px)" },
-    visible: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-      filter: "blur(0px)",
-      transition: { duration: 1, delay: index * 0.2, ease: "easeOut" },
-    },
+    visible: { opacity: 1, x: 0, y: 0, filter: "blur(0px)" },
   })
 
+  // Navigation links configuration
   const navLinks = [
     { href: "#picks", label: "Daily Picks" },
     { href: "#premium", label: "Premium" },
@@ -556,7 +518,7 @@ export default function TennisMenacePage() {
           </motion.div>
         </motion.section>
 
-        {/* Premium + AI Chat Section */}
+        {/* Premium + AI Chat Section */
         <motion.section
           id="premium"
           className="py-20 md:py-32"
@@ -702,6 +664,27 @@ export default function TennisMenacePage() {
               </CardContent>
             </Card>
           </div>
+        </motion.section>
+        }
+        
+        {/* Player Search Section */}
+        <motion.section
+          id="search"
+          className="py-20 md:py-32"
+          variants={sectionVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-6 theme-transition-text">
+              Player Rankings
+            </h2>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto theme-transition-text">
+              Search through the latest ATP rankings and discover detailed information about your favorite tennis players.
+            </p>
+          </div>
+          <PlayerSearch />
         </motion.section>
 
         {/* Articles & Analysis Section */}
