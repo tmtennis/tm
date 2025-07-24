@@ -678,7 +678,7 @@ export default function TennisMenacePage() {
         >
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-6 theme-transition-text">
-              Player Rankings
+              Player Guide
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto theme-transition-text">
               Search through the latest ATP rankings and discover detailed information about your favorite tennis players.
