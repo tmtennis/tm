@@ -821,12 +821,31 @@ export default function MediaBuilderPage() {
                     />
                     <label 
                       htmlFor="csv-upload" 
-                      className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border border-gray-700 text-sm font-medium"
+                      className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer text-sm font-medium text-white transition-all duration-200"
+                      style={{ 
+                        background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
+                        border: '1px solid rgba(59, 130, 246, 0.3)',
+                        backdropFilter: 'blur(4px)'
+                      }}
                     >
                       <Upload className="h-4 w-4" />
                       Upload CSV File
                     </label>
                   </div>
+
+                  {/* Custom Mode Toggle - Priority #2 */}
+                  <Button 
+                    onClick={toggleCustomMode} 
+                    className="w-full justify-start text-white border transition-all duration-200"
+                    style={{ 
+                      background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
+                      borderColor: 'rgba(59, 130, 246, 0.3)',
+                      backdropFilter: 'blur(4px)'
+                    }}
+                  >
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    Enter Custom Mode
+                  </Button>
 
                   {/* Upload Player Image - Priority #2 */}
                   {!customPlayerImage ? (
@@ -840,39 +859,38 @@ export default function MediaBuilderPage() {
                       />
                       <label 
                         htmlFor="image-upload" 
-                        className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border border-gray-700 text-sm font-medium"
+                        className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer text-sm font-medium text-white transition-all duration-200"
+                        style={{ 
+                          background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
+                          border: '1px solid rgba(59, 130, 246, 0.3)',
+                          backdropFilter: 'blur(4px)'
+                        }}
                       >
                         <Image className="h-4 w-4" />
                         Upload Player Image
                       </label>
                     </div>
                   ) : (
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                          id="image-upload-replace"
-                        />
-                        <label 
-                          htmlFor="image-upload-replace" 
-                          className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border border-gray-700 text-sm font-medium"
-                        >
-                          <Image className="h-4 w-4" />
-                          Change Image
-                          <span className="text-xs text-green-400">✓</span>
-                        </label>
-                      </div>
-                      <Button 
-                        size="sm"
-                        onClick={() => setCustomPlayerImage(null)}
-                        className="px-3 bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700"
-                        title="Reset to default image"
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        id="image-upload-replace"
+                      />
+                      <label 
+                        htmlFor="image-upload-replace" 
+                        className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer text-sm font-medium text-white transition-all duration-200"
+                        style={{ 
+                          background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
+                          border: '1px solid rgba(59, 130, 246, 0.3)',
+                          backdropFilter: 'blur(4px)'
+                        }}
                       >
-                        <X className="h-4 w-4" />
-                      </Button>
+                        <Image className="h-4 w-4" />
+                        Change Image
+                      </label>
                     </div>
                   )}
 
@@ -881,7 +899,12 @@ export default function MediaBuilderPage() {
                     <Button 
                       onClick={exportStatsCard}
                       disabled={isExporting}
-                      className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700 disabled:opacity-50 disabled:hover:bg-black disabled:hover:scale-100"
+                      className="w-full justify-start text-white transition-all duration-200 disabled:opacity-50"
+                      style={{ 
+                        background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
+                        borderColor: 'rgba(59, 130, 246, 0.3)',
+                        backdropFilter: 'blur(4px)'
+                      }}
                     >
                       <Download className="h-4 w-4 mr-2" />
                       {isExporting ? 'Exporting...' : 'Export Stats Card'}
@@ -891,7 +914,12 @@ export default function MediaBuilderPage() {
                   {/* CSV Builder Link */}
                   <Button 
                     asChild
-                    className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700"
+                    className="w-full justify-start text-white transition-all duration-200"
+                    style={{ 
+                      background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
+                      borderColor: 'rgba(59, 130, 246, 0.3)',
+                      backdropFilter: 'blur(4px)'
+                    }}
                   >
                     <a 
                       href="https://docs.google.com/spreadsheets/d/1aJUVrcaeO6KzZgOf1vk4JHmLAW5AEEMhbn_rLJjrsl8/edit?usp=sharing"
@@ -908,19 +936,15 @@ export default function MediaBuilderPage() {
                   <Button 
                     onClick={loadSinner2024Data}
                     disabled={isLoading} 
-                    className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700 disabled:opacity-50 disabled:hover:bg-black disabled:hover:scale-100"
+                    className="w-full justify-start text-white transition-all duration-200 disabled:opacity-50"
+                    style={{ 
+                      background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
+                      borderColor: 'rgba(59, 130, 246, 0.3)',
+                      backdropFilter: 'blur(4px)'
+                    }}
                   >
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Load Sinner 2024 Data
-                  </Button>
-
-                  {/* Custom Mode Toggle */}
-                  <Button 
-                    onClick={toggleCustomMode} 
-                    className="w-full justify-start hover:scale-105 transition-all duration-200 text-white border bg-black hover:bg-green-600 border-gray-700"
-                  >
-                    <Edit3 className="h-4 w-4 mr-2" />
-                    Enter Custom Mode
                   </Button>
                 </>
               ) : (
