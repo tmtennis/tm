@@ -21,6 +21,7 @@ export function Navbar({
     { href: "#picks", label: "Daily Picks" },
     { href: "#premium", label: "Premium" },
     { href: "#analysis", label: "Analysis" },
+    { href: "/media-builder", label: "Media Builder" },
     { href: "#contact", label: "Contact" },
   ],
   className = ""
