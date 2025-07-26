@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Upload, Download, BarChart3, Palette, ExternalLink, Image, X, Edit3, Save, Copy, Trophy, Star, Crown, Medal } from "lucide-react"
+import { Upload, Download, BarChart3, Palette, ExternalLink, Image, X, Edit3, Save, Copy, Trophy, Star, Crown, Medal, RotateCcw } from "lucide-react"
 import { toPng } from 'html-to-image'
 
 interface MatchData {
@@ -72,9 +72,6 @@ interface CustomContent {
 }
 
 interface TextStyles {
-  playerNameSize: number
-  rankSize: number
-  recordSize: number
   surfaceSize: number
   footerSize: number
   accentColor: string
@@ -121,9 +118,6 @@ export default function MediaBuilderPage() {
     overallRecordLabel: "OVERALL RECORD"
   })
   const [textStyles, setTextStyles] = useState<TextStyles>({
-    playerNameSize: 50, // 0-100 scale
-    rankSize: 30, // 0-100 scale  
-    recordSize: 40, // 0-100 scale
     surfaceSize: 1, // text-lg
     footerSize: 0, // text-sm
     accentColor: '#60a5fa', // blue-400
@@ -613,9 +607,6 @@ export default function MediaBuilderPage() {
       
       // Reset text styles in custom mode
       setTextStyles({
-        playerNameSize: 50,
-        rankSize: 30,
-        recordSize: 40,
         surfaceSize: 1,
         footerSize: 0,
         accentColor: '#60a5fa',
@@ -635,9 +626,6 @@ export default function MediaBuilderPage() {
       
       // Reset text styles to defaults
       setTextStyles({
-        playerNameSize: 50, // 0-100 scale
-        rankSize: 30, // 0-100 scale  
-        recordSize: 40, // 0-100 scale
         surfaceSize: 1, // text-lg
         footerSize: 0, // text-sm
         accentColor: '#60a5fa', // blue-400
@@ -740,6 +728,15 @@ export default function MediaBuilderPage() {
 
   const updateTextStyles = (field: keyof TextStyles, value: number | string) => {
     setTextStyles(prev => ({ ...prev, [field]: value }))
+  }
+
+  const resetTextColors = () => {
+    setTextStyles(prev => ({
+      ...prev,
+      accentColor: '#60a5fa', // blue-400
+      primaryColor: '#ffffff', // white
+      secondaryColor: '#d1d5db' // gray-300
+    }))
   }
 
   const exportCustomJSON = () => {
@@ -1153,15 +1150,23 @@ export default function MediaBuilderPage() {
                         ))}
                       </div>
                       <div className="grid grid-cols-2 gap-1.5">
-                        <select
-                          value={customContent.grandSlamCount}
-                          onChange={(e) => updateCustomContent('grandSlamCount', e.target.value)}
-                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
-                        >
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((count) => (
-                            <option key={count} value={count.toString()}>{count}</option>
-                          ))}
-                        </select>
+                        <div>
+                          <div className="flex gap-1">
+                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((count) => (
+                              <button
+                                key={count}
+                                onClick={() => updateCustomContent('grandSlamCount', count.toString())}
+                                className={`flex-1 h-6 text-xs rounded transition-all flex items-center justify-center ${
+                                  customContent.grandSlamCount === count.toString()
+                                    ? 'bg-green-600 text-white border border-green-500'
+                                    : 'bg-gray-800 text-gray-300 border border-gray-600 hover:bg-gray-700'
+                                }`}
+                              >
+                                {count}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                         <input
                           type="text"
                           value={customContent.trophyLabel}
@@ -1193,175 +1198,87 @@ export default function MediaBuilderPage() {
 
                   {/* Compact Controls Section */}
                   <div className="space-y-2 border-t border-gray-700 pt-2">
-                    {/* Image Upload */}
-                    <div className="flex gap-1">
-                      <label className="flex-1 cursor-pointer">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          className="hidden"
-                        />
-                        <div className="flex items-center justify-center h-7 px-2 rounded bg-gray-800 border border-gray-700 hover:bg-gray-700 transition-colors">
-                          <Image className="h-3 w-3 mr-1 text-gray-400" />
-                          <span className="text-xs text-gray-300">
-                            {customPlayerImage ? 'Change' : 'Upload'}
-                          </span>
+                    {/* Theme Selector, Font Colors, and Image Upload - Combined */}
+                    <div className="flex items-start justify-between gap-4">
+                      {/* Themes */}
+                      <div className="flex-shrink-0">
+                        <div className="text-xs text-gray-400 mb-1">Themes</div>
+                        <div className="flex gap-1">
+                          {themes.map((theme) => (
+                            <button
+                              key={theme.id}
+                              onClick={() => setCurrentTheme(theme)}
+                              className={`flex-shrink-0 w-6 h-6 rounded ${theme.background} border-2 transition-all ${
+                                currentTheme.id === theme.id
+                                  ? 'border-green-400 ring-1 ring-green-400/50'
+                                  : 'border-gray-600 hover:border-gray-500'
+                              }`}
+                              title={theme.name}
+                            />
+                          ))}
                         </div>
-                      </label>
-                      {customPlayerImage && (
-                        <Button
-                          onClick={() => setCustomPlayerImage(null)}
-                          className="h-7 w-7 p-0 bg-red-900/40 hover:bg-red-600/50 border-red-700/50"
-                          title="Remove"
-                        >
-                          <X className="h-3 w-3" />
-                        </Button>
-                      )}
-                    </div>
+                      </div>
+                      
+                      {/* Font Colors */}
+                      <div className="flex-shrink-0">
+                        <div className="text-xs text-gray-400 mb-1">Colors</div>
+                        <div className="flex gap-1 items-center">
+                          <div className="flex gap-1">
+                            <input
+                              type="color"
+                              value={textStyles.accentColor}
+                              onChange={(e) => updateTextStyles('accentColor', e.target.value)}
+                              className="w-6 h-6 rounded border border-gray-700 cursor-pointer"
+                              title="Accent Color (Win Rate, Percentages)"
+                            />
+                            <input
+                              type="color"
+                              value={textStyles.primaryColor}
+                              onChange={(e) => updateTextStyles('primaryColor', e.target.value)}
+                              className="w-6 h-6 rounded border border-gray-700 cursor-pointer"
+                              title="Primary Color (Player Name, Records)"
+                            />
+                            <input
+                              type="color"
+                              value={textStyles.secondaryColor}
+                              onChange={(e) => updateTextStyles('secondaryColor', e.target.value)}
+                              className="w-6 h-6 rounded border border-gray-700 cursor-pointer"
+                              title="Secondary Color (Labels, Subtext)"
+                            />
+                          </div>
+                          <button
+                            onClick={resetTextColors}
+                            className="p-1 rounded hover:bg-gray-700 transition-colors ml-1"
+                            title="Reset colors to default"
+                          >
+                            <RotateCcw className="h-3 w-3 text-gray-400" />
+                          </button>
+                        </div>
+                      </div>
 
-                    {/* Theme Selector - Compact */}
-                    <select
-                      value={currentTheme.id}
-                      onChange={(e) => {
-                        const theme = themes.find(t => t.id === e.target.value)
-                        if (theme) setCurrentTheme(theme)
-                      }}
-                      className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
-                    >
-                      {themes.map((theme) => (
-                        <option key={theme.id} value={theme.id}>{theme.name}</option>
-                      ))}
-                    </select>
-
-                    {/* Style Controls - Compact Grid */}
-                    <div className="grid grid-cols-6 gap-1">
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={textStyles.playerNameSize}
-                        onChange={(e) => updateTextStyles('playerNameSize', parseInt(e.target.value))}
-                        className="w-full px-1 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
-                        placeholder="Name"
-                        title="Name Size"
-                      />
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={textStyles.rankSize}
-                        onChange={(e) => updateTextStyles('rankSize', parseInt(e.target.value))}
-                        className="w-full px-1 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
-                        placeholder="Rank"
-                        title="Rank Size"
-                      />
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={textStyles.recordSize}
-                        onChange={(e) => updateTextStyles('recordSize', parseInt(e.target.value))}
-                        className="w-full px-1 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
-                        placeholder="Record"
-                        title="Record Size"
-                      />
-                      <input
-                        type="color"
-                        value={textStyles.accentColor}
-                        onChange={(e) => updateTextStyles('accentColor', e.target.value)}
-                        className="w-full h-7 rounded border border-gray-700 cursor-pointer"
-                        title="Accent Color"
-                      />
-                      <input
-                        type="color"
-                        value={textStyles.primaryColor}
-                        onChange={(e) => updateTextStyles('primaryColor', e.target.value)}
-                        className="w-full h-7 rounded border border-gray-700 cursor-pointer"
-                        title="Primary Color"
-                      />
-                      <input
-                        type="color"
-                        value={textStyles.secondaryColor}
-                        onChange={(e) => updateTextStyles('secondaryColor', e.target.value)}
-                        className="w-full h-7 rounded border border-gray-700 cursor-pointer"
-                        title="Secondary Color"
-                      />
+                      {/* Image Upload */}
+                      <div className="flex-shrink-0">
+                        <div className="text-xs text-gray-400 mb-1">Image</div>
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                          <div className="flex items-center justify-center h-6 rounded bg-gray-800 border border-gray-700 hover:bg-gray-700 transition-colors px-3">
+                            <Image className="h-3 w-3 mr-1 text-gray-400" />
+                            <span className="text-xs text-gray-300 whitespace-nowrap">
+                              {customPlayerImage ? 'Change' : 'Upload'}
+                            </span>
+                          </div>
+                        </label>
+                      </div>
                     </div>
                   </div>
 
                   {/* Style Controls */}
                   <div className="space-y-1.5 border-t border-gray-700 pt-2">
-                    <div className="grid grid-cols-6 gap-1.5">
-                      {/* Font Sizes */}
-                      <div>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={textStyles.playerNameSize}
-                          onChange={(e) => updateTextStyles('playerNameSize', parseInt(e.target.value))}
-                          className="w-full px-1.5 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
-                          placeholder="Name Size"
-                        />
-                      </div>
-
-                      <div>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={textStyles.rankSize}
-                          onChange={(e) => updateTextStyles('rankSize', parseInt(e.target.value))}
-                          className="w-full px-1.5 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
-                          placeholder="Rank Size"
-                        />
-                      </div>
-
-                      <div>
-                        <input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={textStyles.recordSize}
-                          onChange={(e) => updateTextStyles('recordSize', parseInt(e.target.value))}
-                          className="w-full px-1.5 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
-                          placeholder="Record Size"
-                        />
-                      </div>
-
-                      {/* Colors */}
-                      <div>
-                        <input
-                          type="color"
-                          value={textStyles.accentColor}
-                          onChange={(e) => updateTextStyles('accentColor', e.target.value)}
-                          className="w-full h-7 rounded bg-gray-800 border border-gray-700 cursor-pointer"
-                          title="Accent Color"
-                        />
-                      </div>
-
-                      <div>
-                        <input
-                          type="color"
-                          value={textStyles.primaryColor}
-                          onChange={(e) => updateTextStyles('primaryColor', e.target.value)}
-                          className="w-full h-7 rounded bg-gray-800 border border-gray-700 cursor-pointer"
-                          title="Primary Color"
-                        />
-                      </div>
-
-                      <div>
-                        <input
-                          type="color"
-                          value={textStyles.secondaryColor}
-                          onChange={(e) => updateTextStyles('secondaryColor', e.target.value)}
-                          className="w-full h-7 rounded bg-gray-800 border border-gray-700 cursor-pointer"
-                          title="Secondary Color"
-                        />
-                      </div>
-                    </div>
-
                     {/* Export Options */}
                     <div className="flex gap-1 pt-2 border-t border-gray-700">
                       <Button 
@@ -1433,7 +1350,7 @@ export default function MediaBuilderPage() {
                           </div>
                           <div>
                             <h1 
-                              className={`${getSizeClass(textStyles.playerNameSize)} font-bold mb-1`}
+                              className="text-2xl font-bold mb-1"
                               style={{ 
                                 color: isCustomMode ? textStyles.primaryColor : 'inherit'
                               }}
@@ -1441,7 +1358,7 @@ export default function MediaBuilderPage() {
                               {isCustomMode ? customContent.playerName : playerStats?.playerName}
                             </h1>
                             <div 
-                              className={`${getSizeClass(textStyles.rankSize)} font-semibold`}
+                              className="text-lg font-semibold"
                               style={{ 
                                 color: isCustomMode ? textStyles.accentColor : 'inherit'
                               }}
@@ -1487,7 +1404,7 @@ export default function MediaBuilderPage() {
                         <div className="flex justify-between items-center">
                           <div>
                             <div 
-                              className={`${getSizeClass(textStyles.recordSize)} font-bold`}
+                              className="text-xl font-bold"
                               style={{ 
                                 color: isCustomMode ? textStyles.primaryColor : 'inherit'
                               }}
@@ -1505,7 +1422,7 @@ export default function MediaBuilderPage() {
                           </div>
                           <div>
                             <div 
-                              className={`${getSizeClass(textStyles.recordSize)} font-bold`}
+                              className="text-xl font-bold"
                               style={{ 
                                 color: isCustomMode ? textStyles.primaryColor : 'inherit'
                               }}
@@ -1648,7 +1565,9 @@ export default function MediaBuilderPage() {
                                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                                     result === 'W' 
                                       ? 'bg-green-500 text-white' 
-                                      : 'bg-red-500 text-white'
+                                      : result === 'L'
+                                      ? 'bg-red-500 text-white'
+                                      : 'bg-gray-500 text-white'
                                   }`}
                                 >
                                   {result}
