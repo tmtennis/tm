@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Upload, Download, BarChart3, Palette, ExternalLink, Image, X, RotateCcw } from "lucide-react"
+import { Upload, Download, BarChart3, Palette, ExternalLink, Image, X, Edit3, Save, Copy, Trophy, Star, Crown, Medal } from "lucide-react"
 import { toPng } from 'html-to-image'
 
 interface MatchData {
@@ -41,96 +41,209 @@ interface CardTheme {
   border: string
 }
 
+interface CustomContent {
+  playerName: string
+  atpRank: string
+  season: string
+  winRate: string
+  winRateLabel: string
+  overallRecord: string
+  totalMatches: string
+  clayRecord: string
+  clayPercentage: string
+  grassRecord: string
+  grassPercentage: string
+  hardRecord: string
+  hardPercentage: string
+  highlightsTitle: string
+  highlightsSubtext: string
+  grandSlamCount: string
+  trophyIcon: string
+  trophyLabel: string
+  footerBrand: string
+  footerHandle: string
+  recentFormTitle: string
+  recentFormResults: string[]
+  clayLabel: string
+  grassLabel: string
+  hardLabel: string
+  matchesLabel: string
+  overallRecordLabel: string
+}
+
+interface TextStyles {
+  playerNameSize: number
+  rankSize: number
+  recordSize: number
+  surfaceSize: number
+  footerSize: number
+  accentColor: string
+  primaryColor: string
+  secondaryColor: string
+}
+
 export default function MediaBuilderPage() {
   const [csvData, setCsvData] = useState<MatchData[]>([])
   const [playerStats, setPlayerStats] = useState<PlayerStats | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [customPlayerImage, setCustomPlayerImage] = useState<string | null>(null)
+  const [isCustomMode, setIsCustomMode] = useState(false)
+  const [is2024Era, setIs2024Era] = useState(false)
+  const [formKey, setFormKey] = useState(0) // Add key to force re-render
+  const [customContent, setCustomContent] = useState<CustomContent>({
+    playerName: "Jannik Sinner",
+    atpRank: "#1",
+    season: "2024 Season",
+    winRate: "91%",
+    winRateLabel: "WIN RATE",
+    overallRecord: "73-7",
+    totalMatches: "80",
+    clayRecord: "15-3",
+    clayPercentage: "83%",
+    grassRecord: "7-1", 
+    grassPercentage: "88%",
+    hardRecord: "51-3",
+    hardPercentage: "94%",
+    highlightsTitle: "2024 Season Highlights",
+    highlightsSubtext: "First Italian to win 2 Grand Slams in a year",
+    grandSlamCount: "2",
+    trophyIcon: "trophy",
+    trophyLabel: "Grand Slams",
+    footerBrand: "TennisMenace Analytics",
+    footerHandle: "@TmTennisX",
+    recentFormTitle: "End of Season Form",
+    recentFormResults: ["W", "W", "W", "W", "W", "W"],
+    clayLabel: "Clay",
+    grassLabel: "Grass", 
+    hardLabel: "Hard",
+    matchesLabel: "MATCHES",
+    overallRecordLabel: "OVERALL RECORD"
+  })
+  const [textStyles, setTextStyles] = useState<TextStyles>({
+    playerNameSize: 50, // 0-100 scale
+    rankSize: 30, // 0-100 scale  
+    recordSize: 40, // 0-100 scale
+    surfaceSize: 1, // text-lg
+    footerSize: 0, // text-sm
+    accentColor: '#60a5fa', // blue-400
+    primaryColor: '#ffffff', // white
+    secondaryColor: '#d1d5db' // gray-300
+  })
   const [currentTheme, setCurrentTheme] = useState<CardTheme>({
-    id: 'classic',
-    name: 'Classic',
-    background: 'bg-gradient-to-br from-slate-900 to-slate-800',
-    accent: 'text-blue-400',
+    id: 'us-open-night',
+    name: 'US Open Night',
+    background: 'bg-gradient-to-br from-blue-900 to-indigo-900',
+    accent: 'text-blue-300',
     textPrimary: 'text-white',
-    textSecondary: 'text-slate-300',
-    border: 'border-slate-600/30'
+    textSecondary: 'text-blue-100',
+    border: 'border-blue-400/30'
   })
   const cardRef = useRef<HTMLDivElement>(null)
 
   // Available themes
   const themes: CardTheme[] = [
     {
-      id: 'classic',
-      name: 'Classic',
-      background: 'bg-gradient-to-br from-slate-900 to-slate-800',
-      accent: 'text-blue-400',
+      id: 'wimbledon-green',
+      name: 'Wimbledon',
+      background: 'bg-gradient-to-br from-green-800 to-green-900',
+      accent: 'text-green-300',
       textPrimary: 'text-white',
-      textSecondary: 'text-slate-300',
-      border: 'border-slate-600/30'
+      textSecondary: 'text-green-100',
+      border: 'border-green-400/30'
     },
     {
-      id: 'tennis-court',
-      name: 'Tennis Court',
-      background: 'bg-gradient-to-br from-emerald-800 to-emerald-700',
-      accent: 'text-emerald-300',
-      textPrimary: 'text-white',
-      textSecondary: 'text-emerald-100',
-      border: 'border-emerald-400/30'
-    },
-    {
-      id: 'professional',
-      name: 'Professional',
-      background: 'bg-gradient-to-br from-gray-800 to-gray-700',
-      accent: 'text-amber-400',
-      textPrimary: 'text-white',
-      textSecondary: 'text-gray-200',
-      border: 'border-gray-500/30'
-    },
-    {
-      id: 'sunset-clay',
-      name: 'Sunset Clay',
-      background: 'bg-gradient-to-br from-orange-800 to-red-700',
-      accent: 'text-orange-300',
+      id: 'french-open-clay',
+      name: 'Roland Garros',
+      background: 'bg-gradient-to-br from-orange-700 to-red-800',
+      accent: 'text-orange-200',
       textPrimary: 'text-white',
       textSecondary: 'text-orange-100',
-      border: 'border-orange-400/30'
+      border: 'border-orange-300/40'
     },
     {
-      id: 'midnight-blue',
-      name: 'Midnight Blue',
-      background: 'bg-gradient-to-br from-slate-900 to-blue-900',
-      accent: 'text-cyan-400',
+      id: 'us-open-night',
+      name: 'US Open Night',
+      background: 'bg-gradient-to-br from-blue-900 to-indigo-900',
+      accent: 'text-blue-300',
       textPrimary: 'text-white',
-      textSecondary: 'text-slate-300',
-      border: 'border-cyan-400/30'
+      textSecondary: 'text-blue-100',
+      border: 'border-blue-400/30'
     },
     {
-      id: 'championship',
-      name: 'Championship',
-      background: 'bg-gradient-to-br from-indigo-900 to-purple-800',
-      accent: 'text-yellow-400',
+      id: 'australian-heat',
+      name: 'Australian Heat',
+      background: 'bg-gradient-to-br from-yellow-600 to-orange-700',
+      accent: 'text-yellow-200',
       textPrimary: 'text-white',
-      textSecondary: 'text-indigo-200',
-      border: 'border-yellow-400/30'
+      textSecondary: 'text-yellow-100',
+      border: 'border-yellow-300/40'
+    },
+    {
+      id: 'masters-purple',
+      name: 'Masters',
+      background: 'bg-gradient-to-br from-purple-800 to-violet-900',
+      accent: 'text-purple-300',
+      textPrimary: 'text-white',
+      textSecondary: 'text-purple-100',
+      border: 'border-purple-400/30'
+    },
+    {
+      id: 'davis-cup-navy',
+      name: 'Davis Cup',
+      background: 'bg-gradient-to-br from-slate-700 to-slate-900',
+      accent: 'text-slate-300',
+      textPrimary: 'text-white',
+      textSecondary: 'text-slate-200',
+      border: 'border-slate-400/30'
+    },
+    {
+      id: 'miami-vice',
+      name: 'Miami Vice',
+      background: 'bg-gradient-to-br from-pink-700 to-cyan-800',
+      accent: 'text-pink-300',
+      textPrimary: 'text-white',
+      textSecondary: 'text-cyan-100',
+      border: 'border-pink-400/40'
+    },
+    {
+      id: 'forest-shadow',
+      name: 'Forest Shadow',
+      background: 'bg-gradient-to-br from-emerald-900 to-gray-900',
+      accent: 'text-emerald-400',
+      textPrimary: 'text-gray-100',
+      textSecondary: 'text-emerald-200',
+      border: 'border-emerald-500/30'
+    },
+    {
+      id: 'sunset-court',
+      name: 'Sunset Court',
+      background: 'bg-gradient-to-br from-rose-700 to-amber-800',
+      accent: 'text-rose-200',
+      textPrimary: 'text-white',
+      textSecondary: 'text-amber-100',
+      border: 'border-rose-300/40'
     }
   ]
 
   // Load sample data on component mount
   useEffect(() => {
-    loadSampleData()
+    loadSinner2024Data()
   }, [])
 
-  const loadSampleData = async () => {
+  const loadSinner2024Data = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/data/bublik_sample_post.csv')
+      const response = await fetch('/data/sinner2024.csv')
       const csvText = await response.text()
-      const data = parseCSV(csvText)
+      const data = parseSinnerCSV(csvText)
       setCsvData(data)
-      generateStats(data)
+      generateSinnerStats(data)
+      setIs2024Era(true)
+      // Set Sinner's 2024 image
+      setCustomPlayerImage('/sinner2024.png')
     } catch (error) {
-      console.error('Error loading sample data:', error)
+      console.error('Error loading Sinner 2024 data:', error)
     }
     setIsLoading(false)
   }
@@ -145,9 +258,8 @@ export default function MediaBuilderPage() {
       const score = values[7] || ''
       
       // Determine if it's a win based on result text
-      // If result contains "Bublik d." then it's a win for Bublik
-      // If result contains "d. Bublik" then it's a loss for Bublik
-      const isWin = result.includes('Bublik d.') && !result.includes('d. Bublik')
+      // This is a generic parser - specific player parsers should be used for accurate results
+      const isWin = result.toLowerCase().includes('win') || result.includes(' d. ')
       
       return {
         date: values[0] || '',
@@ -163,6 +275,88 @@ export default function MediaBuilderPage() {
     })
   }
 
+  const parseFedererCSV = (csvText: string): MatchData[] => {
+    const lines = csvText.split('\n').filter(line => line.trim())
+    // Skip header line
+    
+    return lines.slice(1).map(line => {
+      const values = line.split(',')
+      const tournament = values[1] || ''
+      const surface = values[4] || ''
+      const round = values[6] || ''
+      const opponent = values[7] || ''
+      const result = values[8] || ''
+      const score = values[9] || ''
+      
+      // Determine if it's a win based on result (W or L)
+      const isWin = result.trim() === 'W'
+      
+      return {
+        date: values[2] || '',
+        tournament,
+        surface,
+        round,
+        rank: '1', // Federer was #1 in 2006
+        opponentRank: '',
+        result: `${isWin ? 'Federer d.' : 'd. Federer'} ${opponent}`,
+        score: score.replace(/"/g, ''), // Remove quotes from score
+        isWin
+      }
+    })
+  }
+
+  const parseSinnerCSV = (csvText: string): MatchData[] => {
+    const lines = csvText.split('\n').filter(line => line.trim())
+    
+    return lines.slice(1).map(line => {
+      // Handle CSV with quoted fields
+      const values = line.split(',').map(val => val.trim())
+      
+      if (values.length < 6) return null
+      
+      const date = values[0] || ''
+      const tournament = values[1] || ''
+      const surface = values[2] || 'Hard'
+      const sinnerRank = values[3] || '1'
+      const opponentRank = values[4] || ''
+      const matchup = values[5] || ''
+      const score = values[6] || ''
+      
+      // Skip retired matches
+      if (score.includes('RET')) return null
+      
+      // Determine if it's a win based on matchup
+      const isWin = matchup.includes('Sinner d.')
+      
+      // Extract opponent name from matchup
+      let opponent = ''
+      if (isWin) {
+        // "Sinner d. Opponent" format
+        const match = matchup.match(/Sinner d\. (.+?)( \[|$)/)
+        opponent = match ? match[1] : ''
+      } else {
+        // "Opponent d. Sinner" format  
+        const match = matchup.match(/(.+?) d\. .*Sinner/)
+        opponent = match ? match[1] : ''
+      }
+      
+      // Clean up opponent name (remove seeds, rankings)
+      opponent = opponent.replace(/^\([^)]+\)/, '').trim()
+      
+      return {
+        date,
+        tournament,
+        surface,
+        round: '', // Not explicitly in this CSV format
+        rank: sinnerRank,
+        opponentRank,
+        result: matchup,
+        score,
+        isWin
+      }
+    }).filter(match => match !== null) as MatchData[]
+  }
+
   const generateStats = (data: MatchData[]) => {
     if (data.length === 0) return
 
@@ -170,13 +364,9 @@ export default function MediaBuilderPage() {
     const firstResult = data[0].result
     let playerName = 'Player'
     
-    if (firstResult.includes('Bublik')) {
-      playerName = 'Alexander Bublik'
-    } else {
-      // Try to extract player name from result
-      const nameMatch = firstResult.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/)
-      if (nameMatch) playerName = nameMatch[0]
-    }
+    // Try to extract player name from result
+    const nameMatch = firstResult.match(/\b[A-Z][a-z]+ [A-Z][a-z]+\b/)
+    if (nameMatch) playerName = nameMatch[0]
 
     // Get current rank from most recent match
     const currentRank = parseInt(data[0].rank) || 0
@@ -208,6 +398,100 @@ export default function MediaBuilderPage() {
     })
 
     // Get last 6 matches (most recent first)
+    const last6Matches = data.slice(0, 6)
+
+    setPlayerStats({
+      playerName,
+      currentRank,
+      wins,
+      losses,
+      winPercentage,
+      last6Matches,
+      totalMatches: data.length,
+      surfaceRecords
+    })
+  }
+
+  const generateFedererStats = (data: MatchData[]) => {
+    if (data.length === 0) return
+
+    const playerName = 'Roger Federer'
+    const currentRank = 1 // He was #1
+
+    const wins = data.filter(match => match.isWin).length
+    const losses = data.length - wins
+    const winPercentage = data.length > 0 ? (wins / data.length) * 100 : 0
+
+    // Calculate surface records
+    const surfaceRecords: { [surface: string]: { wins: number; losses: number; percentage: number } } = {}
+    
+    data.forEach(match => {
+      const surface = match.surface
+      if (!surfaceRecords[surface]) {
+        surfaceRecords[surface] = { wins: 0, losses: 0, percentage: 0 }
+      }
+      
+      if (match.isWin) {
+        surfaceRecords[surface].wins++
+      } else {
+        surfaceRecords[surface].losses++
+      }
+    })
+
+    // Calculate percentages for each surface
+    Object.keys(surfaceRecords).forEach(surface => {
+      const total = surfaceRecords[surface].wins + surfaceRecords[surface].losses
+      surfaceRecords[surface].percentage = total > 0 ? (surfaceRecords[surface].wins / total) * 100 : 0
+    })
+
+    // Get last 6 matches (reverse order since CSV is chronological)
+    const last6Matches = data.slice(-6).reverse()
+
+    setPlayerStats({
+      playerName,
+      currentRank,
+      wins,
+      losses,
+      winPercentage,
+      last6Matches,
+      totalMatches: data.length,
+      surfaceRecords
+    })
+  }
+
+  const generateSinnerStats = (data: MatchData[]) => {
+    if (data.length === 0) return
+
+    const playerName = 'Jannik Sinner'
+    const currentRank = 1 // He was #1 in 2024
+
+    const wins = data.filter(match => match.isWin).length
+    const losses = data.length - wins
+    const winPercentage = data.length > 0 ? (wins / data.length) * 100 : 0
+
+    // Calculate surface records
+    const surfaceRecords: { [surface: string]: { wins: number; losses: number; percentage: number } } = {}
+    
+    data.forEach(match => {
+      const surface = match.surface
+      if (!surfaceRecords[surface]) {
+        surfaceRecords[surface] = { wins: 0, losses: 0, percentage: 0 }
+      }
+      
+      if (match.isWin) {
+        surfaceRecords[surface].wins++
+      } else {
+        surfaceRecords[surface].losses++
+      }
+    })
+
+    // Calculate percentages for each surface
+    Object.keys(surfaceRecords).forEach(surface => {
+      const total = surfaceRecords[surface].wins + surfaceRecords[surface].losses
+      surfaceRecords[surface].percentage = total > 0 ? (surfaceRecords[surface].wins / total) * 100 : 0
+    })
+
+    // Get last 6 matches (data is already in reverse chronological order - most recent first)
     const last6Matches = data.slice(0, 6)
 
     setPlayerStats({
@@ -268,7 +552,7 @@ export default function MediaBuilderPage() {
   }
 
   const exportStatsCard = async () => {
-    if (!cardRef.current || !playerStats) return
+    if (!cardRef.current || (!playerStats && !isCustomMode)) return
     
     setIsExporting(true)
     try {
@@ -284,7 +568,8 @@ export default function MediaBuilderPage() {
       
       // Create download link
       const link = document.createElement('a')
-      link.download = `${playerStats.playerName.replace(/\s+/g, '_')}_stats_2025.png`
+      const playerName = isCustomMode ? customContent.playerName : playerStats?.playerName || 'Player'
+      link.download = `${playerName.replace(/\s+/g, '_')}_${isCustomMode ? 'custom_' : ''}stats_2025.png`
       link.href = dataUrl
       link.click()
     } catch (error) {
@@ -294,9 +579,215 @@ export default function MediaBuilderPage() {
   }
 
   const resetStatsCard = () => {
-    setPlayerStats(null)
-    setCsvData([])
-    setCustomPlayerImage(null)
+    if (isCustomMode) {
+      // In custom mode, clear all fields and force re-render
+      setCustomContent({
+        playerName: "",
+        atpRank: "",
+        season: "",
+        winRate: "",
+        winRateLabel: "",
+        overallRecord: "",
+        totalMatches: "",
+        clayRecord: "",
+        clayPercentage: "",
+        grassRecord: "",
+        grassPercentage: "",
+        hardRecord: "",
+        hardPercentage: "",
+        highlightsTitle: "",
+        highlightsSubtext: "",
+        grandSlamCount: "",
+        trophyIcon: "",
+        trophyLabel: "",
+        footerBrand: "",
+        footerHandle: "",
+        recentFormTitle: "",
+        recentFormResults: ["", "", "", "", "", ""],
+        clayLabel: "",
+        grassLabel: "", 
+        hardLabel: "",
+        matchesLabel: "",
+        overallRecordLabel: ""
+      })
+      
+      // Reset text styles in custom mode
+      setTextStyles({
+        playerNameSize: 50,
+        rankSize: 30,
+        recordSize: 40,
+        surfaceSize: 1,
+        footerSize: 0,
+        accentColor: '#60a5fa',
+        primaryColor: '#ffffff',
+        secondaryColor: '#d1d5db'
+      })
+      
+      // Reset custom image
+      setCustomPlayerImage(null)
+      
+      // Force re-render by incrementing key
+      setFormKey(prev => prev + 1)
+    } else {
+      // In normal mode, reset everything and reload sample data
+      // Reset custom image
+      setCustomPlayerImage(null)
+      
+      // Reset text styles to defaults
+      setTextStyles({
+        playerNameSize: 50, // 0-100 scale
+        rankSize: 30, // 0-100 scale  
+        recordSize: 40, // 0-100 scale
+        surfaceSize: 1, // text-lg
+        footerSize: 0, // text-sm
+        accentColor: '#60a5fa', // blue-400
+        primaryColor: '#ffffff', // white
+        secondaryColor: '#d1d5db' // gray-300
+      })
+      
+      // Reset theme to US Open Night
+      setCurrentTheme({
+        id: 'us-open-night',
+        name: 'US Open Night',
+        background: 'bg-gradient-to-br from-blue-900 to-indigo-900',
+        accent: 'text-blue-300',
+        textPrimary: 'text-white',
+        textSecondary: 'text-blue-100',
+        border: 'border-blue-400/30'
+      })
+      
+      // Exit custom mode if active
+      setIsCustomMode(false)
+      
+      // Reset 2024 era flag
+      setIs2024Era(false)
+      
+      // Reset custom content to defaults
+      setCustomContent({
+        playerName: "Jannik Sinner",
+        atpRank: "#1",
+        season: "2024 Season",
+        winRate: "91%",
+        winRateLabel: "WIN RATE",
+        overallRecord: "73-7",
+        totalMatches: "80",
+        clayRecord: "15-3",
+        clayPercentage: "83%",
+        grassRecord: "7-1", 
+        grassPercentage: "88%",
+        hardRecord: "51-3",
+        hardPercentage: "94%",
+        highlightsTitle: "2024 Season Highlights",
+        highlightsSubtext: "First Italian to win 2 Grand Slams in a year",
+        grandSlamCount: "2",
+        trophyIcon: "trophy",
+        trophyLabel: "Grand Slams",
+        footerBrand: "TennisMenace Analytics",
+        footerHandle: "@TmTennisX",
+        recentFormTitle: "End of Season Form",
+        recentFormResults: ["W", "W", "W", "W", "W", "W"],
+        clayLabel: "Clay",
+        grassLabel: "Grass", 
+        hardLabel: "Hard",
+        matchesLabel: "MATCHES",
+        overallRecordLabel: "OVERALL RECORD"
+      })
+      
+      // Reload sample data
+      loadSinner2024Data()
+    }
+  }
+
+  const toggleCustomMode = () => {
+    setIsCustomMode(!isCustomMode)
+    if (!isCustomMode) {
+      // Always start with blank custom content when entering custom mode
+      setCustomContent({
+        playerName: "",
+        atpRank: "",
+        season: "",
+        winRate: "",
+        winRateLabel: "",
+        overallRecord: "",
+        totalMatches: "",
+        clayRecord: "",
+        clayPercentage: "",
+        grassRecord: "",
+        grassPercentage: "",
+        hardRecord: "",
+        hardPercentage: "",
+        highlightsTitle: "",
+        highlightsSubtext: "",
+        grandSlamCount: "",
+        trophyIcon: "",
+        trophyLabel: "",
+        footerBrand: "",
+        footerHandle: "",
+        recentFormTitle: "",
+        recentFormResults: ["", "", "", "", "", ""],
+        clayLabel: "",
+        grassLabel: "", 
+        hardLabel: "",
+        matchesLabel: "",
+        overallRecordLabel: ""
+      })
+    }
+  }
+
+  const updateCustomContent = (field: keyof CustomContent, value: string | string[]) => {
+    setCustomContent(prev => ({ ...prev, [field]: value }))
+  }
+
+  const updateTextStyles = (field: keyof TextStyles, value: number | string) => {
+    setTextStyles(prev => ({ ...prev, [field]: value }))
+  }
+
+  const exportCustomJSON = () => {
+    const exportData = {
+      customContent,
+      textStyles,
+      theme: currentTheme.id,
+      customImage: customPlayerImage,
+      timestamp: new Date().toISOString()
+    }
+    
+    const dataStr = JSON.stringify(exportData, null, 2)
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
+    const url = URL.createObjectURL(dataBlob)
+    
+    const link = document.createElement('a')
+    link.download = `${customContent.playerName.replace(/\s+/g, '_')}_custom_media.json`
+    link.href = url
+    link.click()
+    
+    URL.revokeObjectURL(url)
+  }
+
+  const getSizeClass = (size: number) => {
+    // Convert 0-100 scale to CSS font sizes
+    if (size <= 10) return 'text-xs'
+    if (size <= 20) return 'text-sm'
+    if (size <= 30) return 'text-base'
+    if (size <= 40) return 'text-lg'
+    if (size <= 50) return 'text-xl'
+    if (size <= 60) return 'text-2xl'
+    if (size <= 70) return 'text-3xl'
+    if (size <= 80) return 'text-4xl'
+    if (size <= 90) return 'text-5xl'
+    return 'text-6xl' // 90-100
+  }
+
+  const getTrophyIcon = (iconType: string) => {
+    switch (iconType) {
+      case 'star':
+        return <Star className="h-3 w-3 text-blue-400" />
+      case 'crown':
+        return <Crown className="h-3 w-3 text-blue-400" />
+      case 'medal':
+        return <Medal className="h-3 w-3 text-blue-400" />
+      default:
+        return <Trophy className="h-3 w-3 text-blue-400" />
+    }
   }
 
   return (
@@ -316,151 +807,587 @@ export default function MediaBuilderPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Left Column - Controls */}
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold text-foreground mb-4">Controls</h2>
-              
-              {/* Upload CSV - Priority #1 */}
-              <div className="relative">
-                <input
-                  type="file"
-                  accept=".csv"
-                  onChange={handleFileUpload}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                  id="csv-upload"
-                />
-                <label 
-                  htmlFor="csv-upload" 
-                  className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border border-gray-700 text-sm font-medium"
-                >
-                  <Upload className="h-4 w-4" />
-                  Upload CSV File
-                </label>
-              </div>
-
-              {/* Upload Player Image - Priority #2 */}
-              {!customPlayerImage ? (
-                <div className="relative">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    id="image-upload"
-                  />
-                  <label 
-                    htmlFor="image-upload" 
-                    className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border border-gray-700 text-sm font-medium"
-                  >
-                    <Image className="h-4 w-4" />
-                    Upload Player Image
-                  </label>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
+              {!isCustomMode ? (
+                <>
+                  <h2 className="text-xl font-semibold text-foreground mb-4">
+                    Controls
+                  </h2>
+                  
+                  {/* Upload CSV - Priority #1 */}
+                  <div className="relative">
                     <input
                       type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
+                      accept=".csv"
+                      onChange={handleFileUpload}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                      id="image-upload-replace"
+                      id="csv-upload"
                     />
                     <label 
-                      htmlFor="image-upload-replace" 
+                      htmlFor="csv-upload" 
                       className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border border-gray-700 text-sm font-medium"
                     >
-                      <Image className="h-4 w-4" />
-                      Change Image
-                      <span className="text-xs text-green-400">✓</span>
+                      <Upload className="h-4 w-4" />
+                      Upload CSV File
                     </label>
                   </div>
-                  <Button 
-                    size="sm"
-                    onClick={() => setCustomPlayerImage(null)}
-                    className="px-3 bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700"
-                    title="Reset to default image"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
 
-              {/* Export Button */}
-              {playerStats && (
-                <Button 
-                  onClick={exportStatsCard}
-                  disabled={isExporting}
-                  className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700 disabled:opacity-50 disabled:hover:bg-black disabled:hover:scale-100"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  {isExporting ? 'Exporting...' : 'Export Stats Card'}
-                </Button>
-              )}
-
-              {/* CSV Builder Link */}
-              <Button 
-                asChild
-                className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700"
-              >
-                <a 
-                  href="https://docs.google.com/spreadsheets/d/1aJUVrcaeO6KzZgOf1vk4JHmLAW5AEEMhbn_rLJjrsl8/edit?usp=sharing"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  View CSV Builder
-                </a>
-              </Button>
-              
-              {/* Load Sample Data */}
-              <Button onClick={loadSampleData} disabled={isLoading} className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700 disabled:opacity-50 disabled:hover:bg-black disabled:hover:scale-100">
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Load Sample Data (Bublik)
-              </Button>
-
-              {/* Reset Button */}
-              <Button onClick={resetStatsCard} className="w-full justify-start bg-red-900/20 hover:bg-red-600/30 hover:scale-105 transition-all duration-200 text-white border-red-700/50">
-                <RotateCcw className="h-4 w-4 mr-2" />
-                Reset Stats Card
-              </Button>
-
-              {/* Theme Selector with Icons */}
-              <div className="bg-black border border-gray-700 rounded-md p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Palette className="h-4 w-4 text-white" />
-                    <span className="text-white text-sm font-medium">Change Theme: {currentTheme.name}</span>
-                  </div>
-                  <div className="flex gap-1">
-                    {themes.map((theme) => (
-                      <button
-                        key={theme.id}
-                        onClick={() => setCurrentTheme(theme)}
-                        className={`w-6 h-6 rounded border-2 transition-all duration-200 hover:scale-110 ${
-                          currentTheme.id === theme.id 
-                            ? 'border-green-400 ring-1 ring-green-400/50' 
-                            : 'border-gray-600 hover:border-gray-400'
-                        }`}
-                        style={{
-                          background: theme.id === 'classic' ? 'linear-gradient(135deg, #0f172a, #1e293b)' :
-                                     theme.id === 'tennis-court' ? 'linear-gradient(135deg, #065f46, #047857)' :
-                                     theme.id === 'professional' ? 'linear-gradient(135deg, #374151, #4b5563)' :
-                                     theme.id === 'sunset-clay' ? 'linear-gradient(135deg, #9a3412, #b91c1c)' :
-                                     theme.id === 'midnight-blue' ? 'linear-gradient(135deg, #0f172a, #1e3a8a)' :
-                                     'linear-gradient(135deg, #312e81, #7c3aed)'
-                        }}
-                        title={theme.name}
+                  {/* Upload Player Image - Priority #2 */}
+                  {!customPlayerImage ? (
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        id="image-upload"
+                      />
+                      <label 
+                        htmlFor="image-upload" 
+                        className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border border-gray-700 text-sm font-medium"
                       >
-                      </button>
-                    ))}
+                        <Image className="h-4 w-4" />
+                        Upload Player Image
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          id="image-upload-replace"
+                        />
+                        <label 
+                          htmlFor="image-upload-replace" 
+                          className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border border-gray-700 text-sm font-medium"
+                        >
+                          <Image className="h-4 w-4" />
+                          Change Image
+                          <span className="text-xs text-green-400">✓</span>
+                        </label>
+                      </div>
+                      <Button 
+                        size="sm"
+                        onClick={() => setCustomPlayerImage(null)}
+                        className="px-3 bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700"
+                        title="Reset to default image"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Export Button */}
+                  {(playerStats || isCustomMode) && (
+                    <Button 
+                      onClick={exportStatsCard}
+                      disabled={isExporting}
+                      className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700 disabled:opacity-50 disabled:hover:bg-black disabled:hover:scale-100"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      {isExporting ? 'Exporting...' : 'Export Stats Card'}
+                    </Button>
+                  )}
+
+                  {/* CSV Builder Link */}
+                  <Button 
+                    asChild
+                    className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700"
+                  >
+                    <a 
+                      href="https://docs.google.com/spreadsheets/d/1aJUVrcaeO6KzZgOf1vk4JHmLAW5AEEMhbn_rLJjrsl8/edit?usp=sharing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      View CSV Builder
+                    </a>
+                  </Button>
+                  
+                  {/* Load Sinner 2024 Data */}
+                  <Button 
+                    onClick={loadSinner2024Data}
+                    disabled={isLoading} 
+                    className="w-full justify-start bg-black hover:bg-green-600 hover:scale-105 transition-all duration-200 text-white border-gray-700 disabled:opacity-50 disabled:hover:bg-black disabled:hover:scale-100"
+                  >
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Load Sinner 2024 Data
+                  </Button>
+
+                  {/* Custom Mode Toggle */}
+                  <Button 
+                    onClick={toggleCustomMode} 
+                    className="w-full justify-start hover:scale-105 transition-all duration-200 text-white border bg-black hover:bg-green-600 border-gray-700"
+                  >
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    Enter Custom Mode
+                  </Button>
+                </>
+              ) : (
+                // Custom Mode Interface - Replaces all buttons
+                <div className="bg-black border border-gray-700 rounded-md p-2 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Edit3 className="h-3.5 w-3.5 text-blue-400" />
+                      <span className="text-sm font-medium text-blue-400">Custom Mode</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Button 
+                        onClick={toggleCustomMode}
+                        className="h-6 px-2 text-xs bg-red-600/80 hover:bg-red-500/90 border-red-500/50 text-white"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Exit
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Content Editing */}
+                  <div key={formKey} className="space-y-1.5">
+                    {/* Main Info - 3 columns */}
+                    <div className="grid grid-cols-3 gap-1.5">
+                      <input
+                        type="text"
+                        value={customContent.playerName}
+                        onChange={(e) => updateCustomContent('playerName', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Player Name"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.atpRank}
+                        onChange={(e) => updateCustomContent('atpRank', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="ATP Rank"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.season}
+                        onChange={(e) => updateCustomContent('season', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Season"
+                      />
+                    </div>
+
+                    {/* Record Info - 3 columns */}
+                    <div className="grid grid-cols-3 gap-1.5">
+                      <input
+                        type="text"
+                        value={customContent.winRate}
+                        onChange={(e) => updateCustomContent('winRate', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Win Rate"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.overallRecord}
+                        onChange={(e) => updateCustomContent('overallRecord', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Overall Record"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.totalMatches}
+                        onChange={(e) => updateCustomContent('totalMatches', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Total Matches"
+                      />
+                    </div>
+
+                    {/* Win Rate Label - 1 column */}
+                    <div className="grid grid-cols-1 gap-1.5">
+                      <input
+                        type="text"
+                        value={customContent.winRateLabel}
+                        onChange={(e) => updateCustomContent('winRateLabel', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Win Rate Label"
+                      />
+                    </div>
+
+                    {/* Surface Records - 6 columns */}
+                    <div className="grid grid-cols-6 gap-1">
+                      <input
+                        type="text"
+                        value={customContent.clayRecord}
+                        onChange={(e) => updateCustomContent('clayRecord', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Clay"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.clayPercentage}
+                        onChange={(e) => updateCustomContent('clayPercentage', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Clay %"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.grassRecord}
+                        onChange={(e) => updateCustomContent('grassRecord', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Grass"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.grassPercentage}
+                        onChange={(e) => updateCustomContent('grassPercentage', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Grass %"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.hardRecord}
+                        onChange={(e) => updateCustomContent('hardRecord', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Hard"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.hardPercentage}
+                        onChange={(e) => updateCustomContent('hardPercentage', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Hard %"
+                      />
+                    </div>
+
+                    {/* Labels - 4 columns */}
+                    <div className="grid grid-cols-4 gap-1.5">
+                      <input
+                        type="text"
+                        value={customContent.clayLabel}
+                        onChange={(e) => updateCustomContent('clayLabel', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Clay Label"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.grassLabel}
+                        onChange={(e) => updateCustomContent('grassLabel', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Grass Label"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.hardLabel}
+                        onChange={(e) => updateCustomContent('hardLabel', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Hard Label"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.matchesLabel}
+                        onChange={(e) => updateCustomContent('matchesLabel', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Matches Label"
+                      />
+                    </div>
+
+                    {/* Recent Form */}
+                    <div className="grid grid-cols-7 gap-1">
+                      <input
+                        type="text"
+                        value={customContent.recentFormTitle}
+                        onChange={(e) => updateCustomContent('recentFormTitle', e.target.value)}
+                        className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Form Title"
+                      />
+                      {customContent.recentFormResults.map((result, index) => (
+                        <input
+                          key={index}
+                          type="text"
+                          value={result}
+                          onChange={(e) => {
+                            const newResults = [...customContent.recentFormResults]
+                            newResults[index] = e.target.value
+                            updateCustomContent('recentFormResults', newResults)
+                          }}
+                          className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white text-center"
+                          placeholder={index < 2 ? "W" : index < 4 ? "L" : "W"}
+                          maxLength={1}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Highlights & Footer - 2 columns */}
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <input
+                        type="text"
+                        value={customContent.highlightsTitle}
+                        onChange={(e) => updateCustomContent('highlightsTitle', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Highlights Title"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.highlightsSubtext}
+                        onChange={(e) => updateCustomContent('highlightsSubtext', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Highlights Subtext"
+                      />
+                    </div>
+
+                    {/* Trophy Section - Compact */}
+                    <div className="space-y-1.5">
+                      <div className="flex gap-1">
+                        {[
+                          { icon: 'trophy', component: <Trophy className="h-4 w-4" /> },
+                          { icon: 'star', component: <Star className="h-4 w-4" /> },
+                          { icon: 'crown', component: <Crown className="h-4 w-4" /> },
+                          { icon: 'medal', component: <Medal className="h-4 w-4" /> }
+                        ].map(({ icon, component }) => (
+                          <button
+                            key={icon}
+                            onClick={() => updateCustomContent('trophyIcon', icon)}
+                            className={`flex-1 h-8 flex items-center justify-center rounded border-2 transition-all ${
+                              customContent.trophyIcon === icon
+                                ? 'border-green-500 bg-green-500/20 text-green-400'
+                                : 'border-gray-600 bg-gray-800 text-gray-400 hover:border-gray-500'
+                            }`}
+                          >
+                            {component}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <select
+                          value={customContent.grandSlamCount}
+                          onChange={(e) => updateCustomContent('grandSlamCount', e.target.value)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        >
+                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((count) => (
+                            <option key={count} value={count.toString()}>{count}</option>
+                          ))}
+                        </select>
+                        <input
+                          type="text"
+                          value={customContent.trophyLabel}
+                          onChange={(e) => updateCustomContent('trophyLabel', e.target.value)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Trophy Label"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Footer - 2 columns */}
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <input
+                        type="text"
+                        value={customContent.footerBrand}
+                        onChange={(e) => updateCustomContent('footerBrand', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Footer Brand"
+                      />
+                      <input
+                        type="text"
+                        value={customContent.footerHandle}
+                        onChange={(e) => updateCustomContent('footerHandle', e.target.value)}
+                        className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Footer Handle"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Compact Controls Section */}
+                  <div className="space-y-2 border-t border-gray-700 pt-2">
+                    {/* Image Upload */}
+                    <div className="flex gap-1">
+                      <label className="flex-1 cursor-pointer">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                        />
+                        <div className="flex items-center justify-center h-7 px-2 rounded bg-gray-800 border border-gray-700 hover:bg-gray-700 transition-colors">
+                          <Image className="h-3 w-3 mr-1 text-gray-400" />
+                          <span className="text-xs text-gray-300">
+                            {customPlayerImage ? 'Change' : 'Upload'}
+                          </span>
+                        </div>
+                      </label>
+                      {customPlayerImage && (
+                        <Button
+                          onClick={() => setCustomPlayerImage(null)}
+                          className="h-7 w-7 p-0 bg-red-900/40 hover:bg-red-600/50 border-red-700/50"
+                          title="Remove"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Theme Selector - Compact */}
+                    <select
+                      value={currentTheme.id}
+                      onChange={(e) => {
+                        const theme = themes.find(t => t.id === e.target.value)
+                        if (theme) setCurrentTheme(theme)
+                      }}
+                      className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                    >
+                      {themes.map((theme) => (
+                        <option key={theme.id} value={theme.id}>{theme.name}</option>
+                      ))}
+                    </select>
+
+                    {/* Style Controls - Compact Grid */}
+                    <div className="grid grid-cols-6 gap-1">
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={textStyles.playerNameSize}
+                        onChange={(e) => updateTextStyles('playerNameSize', parseInt(e.target.value))}
+                        className="w-full px-1 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Name"
+                        title="Name Size"
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={textStyles.rankSize}
+                        onChange={(e) => updateTextStyles('rankSize', parseInt(e.target.value))}
+                        className="w-full px-1 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Rank"
+                        title="Rank Size"
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={textStyles.recordSize}
+                        onChange={(e) => updateTextStyles('recordSize', parseInt(e.target.value))}
+                        className="w-full px-1 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                        placeholder="Record"
+                        title="Record Size"
+                      />
+                      <input
+                        type="color"
+                        value={textStyles.accentColor}
+                        onChange={(e) => updateTextStyles('accentColor', e.target.value)}
+                        className="w-full h-7 rounded border border-gray-700 cursor-pointer"
+                        title="Accent Color"
+                      />
+                      <input
+                        type="color"
+                        value={textStyles.primaryColor}
+                        onChange={(e) => updateTextStyles('primaryColor', e.target.value)}
+                        className="w-full h-7 rounded border border-gray-700 cursor-pointer"
+                        title="Primary Color"
+                      />
+                      <input
+                        type="color"
+                        value={textStyles.secondaryColor}
+                        onChange={(e) => updateTextStyles('secondaryColor', e.target.value)}
+                        className="w-full h-7 rounded border border-gray-700 cursor-pointer"
+                        title="Secondary Color"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Style Controls */}
+                  <div className="space-y-1.5 border-t border-gray-700 pt-2">
+                    <div className="grid grid-cols-6 gap-1.5">
+                      {/* Font Sizes */}
+                      <div>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={textStyles.playerNameSize}
+                          onChange={(e) => updateTextStyles('playerNameSize', parseInt(e.target.value))}
+                          className="w-full px-1.5 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Name Size"
+                        />
+                      </div>
+
+                      <div>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={textStyles.rankSize}
+                          onChange={(e) => updateTextStyles('rankSize', parseInt(e.target.value))}
+                          className="w-full px-1.5 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Rank Size"
+                        />
+                      </div>
+
+                      <div>
+                        <input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={textStyles.recordSize}
+                          onChange={(e) => updateTextStyles('recordSize', parseInt(e.target.value))}
+                          className="w-full px-1.5 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Record Size"
+                        />
+                      </div>
+
+                      {/* Colors */}
+                      <div>
+                        <input
+                          type="color"
+                          value={textStyles.accentColor}
+                          onChange={(e) => updateTextStyles('accentColor', e.target.value)}
+                          className="w-full h-7 rounded bg-gray-800 border border-gray-700 cursor-pointer"
+                          title="Accent Color"
+                        />
+                      </div>
+
+                      <div>
+                        <input
+                          type="color"
+                          value={textStyles.primaryColor}
+                          onChange={(e) => updateTextStyles('primaryColor', e.target.value)}
+                          className="w-full h-7 rounded bg-gray-800 border border-gray-700 cursor-pointer"
+                          title="Primary Color"
+                        />
+                      </div>
+
+                      <div>
+                        <input
+                          type="color"
+                          value={textStyles.secondaryColor}
+                          onChange={(e) => updateTextStyles('secondaryColor', e.target.value)}
+                          className="w-full h-7 rounded bg-gray-800 border border-gray-700 cursor-pointer"
+                          title="Secondary Color"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Export Options */}
+                    <div className="flex gap-1 pt-2 border-t border-gray-700">
+                      <Button 
+                        onClick={exportStatsCard}
+                        disabled={isExporting}
+                        className="flex-1 h-7 text-xs bg-green-700 hover:bg-green-600 transition-all duration-200 text-white"
+                      >
+                        <Download className="h-3 w-3 mr-1" />
+                        {isExporting ? 'Exporting...' : 'Export'}
+                      </Button>
+                      <Button 
+                        onClick={exportCustomJSON}
+                        className="flex-1 h-7 text-xs bg-blue-700 hover:bg-blue-600 transition-all duration-200 text-white"
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        JSON
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Right Column - Stats Card */}
             <div className="flex justify-center lg:justify-end">
-              {playerStats && (
+              {(playerStats || isCustomMode) && (
                 <div 
                   ref={cardRef} 
                   className={`w-[800px] h-[450px] ${currentTheme.background} rounded-3xl overflow-hidden relative`}
@@ -471,8 +1398,12 @@ export default function MediaBuilderPage() {
                     {/* Background Image with Overlay */}
                     <div className="absolute inset-0">
                       <img 
-                        src={customPlayerImage || (playerStats.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')} 
-                        alt={playerStats.playerName}
+                        src={customPlayerImage || (
+                          isCustomMode 
+                            ? (customContent.playerName.toLowerCase().includes('bublik') ? '/bublik.png' : '/placeholder-user.jpg')
+                            : (playerStats?.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')
+                        )} 
+                        alt={isCustomMode ? customContent.playerName : playerStats?.playerName}
                         className="w-full h-full object-cover opacity-25"
                       />
                       <div className={`absolute inset-0 ${
@@ -491,31 +1422,61 @@ export default function MediaBuilderPage() {
                         <div className="flex items-center gap-4">
                           <div className={`w-20 h-20 rounded-full overflow-hidden border-4 ${currentTheme.border} shadow-2xl`}>
                             <img 
-                              src={customPlayerImage || (playerStats.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')} 
-                              alt={playerStats.playerName}
+                              src={customPlayerImage || (
+                                isCustomMode 
+                                  ? (customContent.playerName.toLowerCase().includes('bublik') ? '/bublik.png' : '/placeholder-user.jpg')
+                                  : (playerStats?.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')
+                              )} 
+                              alt={isCustomMode ? customContent.playerName : playerStats?.playerName}
                               className="w-full h-full object-cover"
                             />
                           </div>
                           <div>
-                            <h1 className={`text-3xl font-bold ${currentTheme.textPrimary} mb-1`}>
-                              {playerStats.playerName}
+                            <h1 
+                              className={`${getSizeClass(textStyles.playerNameSize)} font-bold mb-1`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.playerName : playerStats?.playerName}
                             </h1>
-                            <div className={`text-lg ${currentTheme.accent} font-semibold`}>
-                              ATP Rank #{playerStats.currentRank}
+                            <div 
+                              className={`${getSizeClass(textStyles.rankSize)} font-semibold`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.accentColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.atpRank : `ATP Rank #${playerStats?.currentRank}`}
                             </div>
-                            <div className={`text-sm ${currentTheme.textSecondary}`}>
-                              2025 Season
+                            <div 
+                              className={`text-sm`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.season : 
+                               is2024Era ? '2024 Season' : '2025 Season'}
                             </div>
                           </div>
                         </div>
                         
                         {/* Win Percentage Highlight */}
                         <div className="text-right">
-                          <div className={`text-4xl font-bold ${currentTheme.accent} mb-1`}>
-                            {playerStats.winPercentage.toFixed(0)}%
+                          <div 
+                            className={`text-4xl font-bold mb-1`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.accentColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.winRate : `${playerStats?.winPercentage.toFixed(0)}%`}
                           </div>
-                          <div className={`text-xs ${currentTheme.textSecondary} uppercase tracking-wide`}>
-                            Win Rate
+                          <div 
+                            className={`text-xs uppercase tracking-wide`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.winRateLabel : "Win Rate"}
                           </div>
                         </div>
                       </div>
@@ -525,90 +1486,257 @@ export default function MediaBuilderPage() {
                         {/* Overall Record */}
                         <div className="flex justify-between items-center">
                           <div>
-                            <div className={`text-2xl font-bold ${currentTheme.textPrimary}`}>
-                              {playerStats.wins}-{playerStats.losses}
+                            <div 
+                              className={`${getSizeClass(textStyles.recordSize)} font-bold`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.overallRecord : `${playerStats?.wins}-${playerStats?.losses}`}
                             </div>
-                            <div className={`text-xs ${currentTheme.textSecondary} uppercase`}>
-                              Overall Record
+                            <div 
+                              className={`text-xs uppercase`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.overallRecordLabel : "Overall Record"}
                             </div>
                           </div>
                           <div>
-                            <div className={`text-2xl font-bold ${currentTheme.textPrimary}`}>
-                              {playerStats.totalMatches}
+                            <div 
+                              className={`${getSizeClass(textStyles.recordSize)} font-bold`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.totalMatches : playerStats?.totalMatches}
                             </div>
-                            <div className={`text-xs ${currentTheme.textSecondary} uppercase`}>
-                              Matches
+                            <div 
+                              className={`text-xs uppercase`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.matchesLabel : "Matches"}
                             </div>
                           </div>
                         </div>
 
                         {/* Surface Records */}
                         <div className="grid grid-cols-3 gap-3">
-                          {Object.entries(playerStats.surfaceRecords).map(([surface, record]) => (
-                            <div key={surface} className="text-center">
-                              <div className={`text-sm font-bold ${currentTheme.textPrimary}`}>
-                                {record.wins}-{record.losses}
+                          {isCustomMode ? (
+                            <>
+                              <div className="text-center">
+                                <div 
+                                  className={`text-sm font-bold`}
+                                  style={{ 
+                                    color: textStyles.primaryColor
+                                  }}
+                                >
+                                  {customContent.clayRecord}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.secondaryColor
+                                  }}
+                                >
+                                  {customContent.clayLabel}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.accentColor
+                                  }}
+                                >
+                                  {customContent.clayPercentage}
+                                </div>
                               </div>
-                              <div className={`text-xs ${currentTheme.textSecondary}`}>
-                                {surface}
+                              <div className="text-center">
+                                <div 
+                                  className={`text-sm font-bold`}
+                                  style={{ 
+                                    color: textStyles.primaryColor
+                                  }}
+                                >
+                                  {customContent.grassRecord}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.secondaryColor
+                                  }}
+                                >
+                                  {customContent.grassLabel}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.accentColor
+                                  }}
+                                >
+                                  {customContent.grassPercentage}
+                                </div>
                               </div>
-                              <div className={`text-xs ${currentTheme.accent}`}>
-                                {record.percentage.toFixed(0)}%
+                              <div className="text-center">
+                                <div 
+                                  className={`text-sm font-bold`}
+                                  style={{ 
+                                    color: textStyles.primaryColor
+                                  }}
+                                >
+                                  {customContent.hardRecord}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.secondaryColor
+                                  }}
+                                >
+                                  {customContent.hardLabel}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.accentColor
+                                  }}
+                                >
+                                  {customContent.hardPercentage}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            </>
+                          ) : (
+                            playerStats && Object.entries(playerStats.surfaceRecords).map(([surface, record]) => (
+                              <div key={surface} className="text-center">
+                                <div className={`text-sm font-bold ${currentTheme.textPrimary}`}>
+                                  {record.wins}-{record.losses}
+                                </div>
+                                <div className={`text-xs ${currentTheme.textSecondary}`}>
+                                  {surface}
+                                </div>
+                                <div className={`text-xs ${currentTheme.accent}`}>
+                                  {record.percentage.toFixed(0)}%
+                                </div>
+                              </div>
+                            ))
+                          )}
                         </div>
                       </div>
 
                       {/* Bottom Section - Recent Form */}
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className={`text-lg font-semibold ${currentTheme.textPrimary}`}>Recent Form</h3>
+                          <h3 
+                            className={`text-lg font-semibold`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.recentFormTitle : 
+                             (is2024Era && !isCustomMode ? 'End of Season Form' : 'Recent Form')}
+                          </h3>
                           <div className="flex gap-1">
-                            {playerStats.last6Matches.map((match, index) => (
-                              <div
-                                key={index}
-                                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                                  match.isWin 
-                                    ? 'bg-green-500 text-white' 
-                                    : 'bg-red-500 text-white'
-                                }`}
-                              >
-                                {getMatchResult(match)}
-                              </div>
-                            ))}
+                            {/* Show sample form in custom mode or real data */}
+                            {isCustomMode ? (
+                              // Custom recent form results - only show non-empty ones
+                              customContent.recentFormResults
+                                .filter(result => result.trim() !== '')
+                                .map((result, index) => (
+                                <div
+                                  key={index}
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                    result === 'W' 
+                                      ? 'bg-green-500 text-white' 
+                                      : 'bg-red-500 text-white'
+                                  }`}
+                                >
+                                  {result}
+                                </div>
+                              ))
+                            ) : (
+                              playerStats?.last6Matches.map((match, index) => (
+                                <div
+                                  key={index}
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                    match.isWin 
+                                      ? 'bg-green-500 text-white' 
+                                      : 'bg-red-500 text-white'
+                                  }`}
+                                >
+                                  {getMatchResult(match)}
+                                </div>
+                              ))
+                            )}
                           </div>
                         </div>
 
-                        {/* Latest Match Detail */}
+                        {/* 2024 Achievements / Latest Match Detail */}
                         <div className={`bg-white/10 backdrop-blur-sm rounded-xl p-3 border ${currentTheme.border}`}>
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <div className={`${currentTheme.textPrimary} font-medium text-sm`}>
-                                Latest: {formatResult(playerStats.last6Matches[0].result).split(' d. ')[1]?.split(' vs ')[0] || 'Opponent'}
+                          {(is2024Era && !isCustomMode) || isCustomMode ? (
+                            /* 2024 Major Titles for Sinner or Custom Mode */
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div 
+                                  className={`font-medium text-sm`}
+                                  style={{ 
+                                    color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                                  }}
+                                >
+                                  {isCustomMode ? customContent.highlightsTitle : "2024 Season Highlights"}
+                                </div>
+                                <div 
+                                  className={`text-xs ${currentTheme.accent}`}
+                                >
+                                  {isCustomMode ? customContent.highlightsSubtext : "First Italian to win 2 Grand Slams in a year"}
+                                </div>
                               </div>
-                              <div className={`${currentTheme.textSecondary} text-xs`}>
-                                {playerStats.last6Matches[0].tournament} • {playerStats.last6Matches[0].round}
+                              <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-0.5" title="Grand Slams: Australian Open & US Open">
+                                  {isCustomMode ? (
+                                    // Render the selected number of trophy icons
+                                    Array.from({ length: parseInt(customContent.grandSlamCount) || 0 }, (_, index) => (
+                                      <span key={index}>{getTrophyIcon(customContent.trophyIcon)}</span>
+                                    ))
+                                  ) : (
+                                    <>
+                                      <Trophy className="h-3 w-3 text-blue-400" />
+                                      <Trophy className="h-3 w-3 text-blue-400" />
+                                    </>
+                                  )}
+                                  {(isCustomMode && parseInt(customContent.grandSlamCount) > 0) || (!isCustomMode) ? (
+                                    <span 
+                                      className={`text-xs ml-1`}
+                                      style={{ 
+                                        color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                                      }}
+                                    >
+                                      {isCustomMode ? customContent.trophyLabel : "Grand Slams"}
+                                    </span>
+                                  ) : null}
+                                </div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className={`text-sm font-bold ${getMatchResultColor(playerStats.last6Matches[0].isWin)}`}>
-                                {getMatchResult(playerStats.last6Matches[0])}
-                              </div>
-                              <div className={`${currentTheme.textSecondary} text-xs`}>
-                                {playerStats.last6Matches[0].score.split(' ').slice(0, 2).join(' ')}
-                              </div>
-                            </div>
-                          </div>
+                          ) : null}
                         </div>
 
                         {/* Footer */}
                         <div className={`flex justify-between items-center mt-3 pt-3 border-t ${currentTheme.border}`}>
-                          <div className={`text-xs ${currentTheme.textSecondary}`}>
-                            TennisMenace Analytics
+                          <div 
+                            className={`text-xs`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.footerBrand : 'TennisMenace Analytics'}
                           </div>
-                          <div className={`text-xs ${currentTheme.accent} font-medium`}>
-                            @TmTennisX
+                          <div 
+                            className={`text-xs font-medium`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.accentColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.footerHandle : '@TmTennisX'}
                           </div>
                         </div>
                       </div>
@@ -628,7 +1756,7 @@ export default function MediaBuilderPage() {
           )}
 
           {/* Empty State */}
-          {!playerStats && !isLoading && (
+          {!playerStats && !isLoading && !isCustomMode && (
             <Card className="bg-card border-border">
               <CardContent className="text-center py-12">
                 <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
