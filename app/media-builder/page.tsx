@@ -983,28 +983,7 @@ export default function MediaBuilderPage() {
                     Controls
                   </h2>
                   
-                  {/* Upload CSV - Priority #1 */}
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={handleFileUpload}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                      id="csv-upload"
-                    />
-                    <label 
-                      htmlFor="csv-upload" 
-                      className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer text-sm font-medium text-white transition-all duration-200"
-                      style={{ 
-                        background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
-                        border: '1px solid rgba(59, 130, 246, 0.3)',
-                        backdropFilter: 'blur(4px)'
-                      }}
-                    >
-                      <Upload className="h-4 w-4" />
-                      Upload CSV File
-                    </label>
-                  </div>
+
 
                   {/* Custom Mode Toggle - Priority #2 */}
                   <Button 
@@ -1043,29 +1022,7 @@ export default function MediaBuilderPage() {
                         Upload Player Image
                       </label>
                     </div>
-                  ) : (
-                    <div className="relative">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                        id="image-upload-replace"
-                      />
-                      <label 
-                        htmlFor="image-upload-replace" 
-                        className="flex items-center gap-2 w-full justify-start px-4 py-2 rounded-md cursor-pointer text-sm font-medium text-white transition-all duration-200"
-                        style={{ 
-                          background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
-                          border: '1px solid rgba(59, 130, 246, 0.3)',
-                          backdropFilter: 'blur(4px)'
-                        }}
-                      >
-                        <Image className="h-4 w-4" />
-                        Change Image
-                      </label>
-                    </div>
-                  )}
+                  ) : null}
 
                   {/* Export Button */}
                   {(playerStats || isCustomMode) && (
@@ -1084,26 +1041,7 @@ export default function MediaBuilderPage() {
                     </Button>
                   )}
 
-                  {/* CSV Builder Link */}
-                  <Button 
-                    asChild
-                    className="w-full justify-start text-white transition-all duration-200"
-                    style={{ 
-                      background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
-                      borderColor: 'rgba(59, 130, 246, 0.3)',
-                      backdropFilter: 'blur(4px)'
-                    }}
-                  >
-                    <a 
-                      href="https://docs.google.com/spreadsheets/d/1aJUVrcaeO6KzZgOf1vk4JHmLAW5AEEMhbn_rLJjrsl8/edit?usp=sharing"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      View CSV Builder
-                    </a>
-                  </Button>
+
                   
                   {/* Load Sinner 2024 Data */}
                   <Button 
