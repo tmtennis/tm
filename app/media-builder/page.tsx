@@ -1,10 +1,22 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Upload, Download, BarChart3, Palette, ExternalLink, Image, X, Edit3, Save, Copy, Trophy, Star, Crown, Medal, RotateCcw } from "lucide-react"
+import { Upload, Download, BarChart3, Palette, ExternalLink, Image, X, Edit3, Save, Copy, Trophy, Star, Crown, Medal, RotateCcw, Menu } from "lucide-react"
 import { toPng } from 'html-to-image'
+import { ThemeToggle } from "@/components/theme-toggle"
+import { LoginModal } from "@/components/login-modal"
+import { UserDropdown } from "@/components/user-dropdown"
+import { useAuth } from "@/contexts/auth-context"
+
+// X.com Icon Component
+const XIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" className={className} fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+)
 
 interface MatchData {
   date: string
@@ -88,6 +100,37 @@ export default function MediaBuilderPage() {
   const [isCustomMode, setIsCustomMode] = useState(false)
   const [is2024Era, setIs2024Era] = useState(false)
   const [formKey, setFormKey] = useState(0) // Add key to force re-render
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { user, loading } = useAuth()
+
+  // Navigation links configuration
+  const navLinks = [
+    { href: "/#picks", label: "Daily Picks" },
+    { href: "/#premium", label: "Premium" },
+    { href: "/#analysis", label: "Analysis" },
+    { href: "/media-builder", label: "Media Builder" },
+    { href: "/#contact", label: "Contact" },
+  ]
+
+  // Force dark mode for this page
+  useEffect(() => {
+    // Store the current theme
+    const currentTheme = document.documentElement.classList.contains('dark')
+    const storedTheme = localStorage.getItem('theme')
+    
+    // Force dark mode
+    document.documentElement.classList.add('dark')
+    document.documentElement.classList.remove('light')
+    
+    // Cleanup function to restore previous theme when leaving the page
+    return () => {
+      if (storedTheme === 'light' || (!storedTheme && !currentTheme)) {
+        document.documentElement.classList.remove('dark')
+        document.documentElement.classList.add('light')
+      }
+    }
+  }, [])
+  
   const [customContent, setCustomContent] = useState<CustomContent>({
     playerName: "Jannik Sinner",
     atpRank: "#1",
@@ -788,18 +831,148 @@ export default function MediaBuilderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-4">
-              Media Builder
-            </h1>
-            <p className="text-lg text-muted-foreground mb-6">
-              Upload a CSV file to generate player statistics and create media content.
-            </p>
+    <div className="min-h-screen font-sans">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 p-4 md:px-8 flex justify-between items-center bg-background/80 backdrop-blur-sm border-b border-border theme-transition-bg theme-transition-border">
+        <motion.a
+          href="/"
+          className="text-2xl font-bold tracking-tighter theme-transition-text"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Tennis<span className="text-primary theme-transition-text">Menace</span>
+        </motion.a>
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
+          {navLinks.map((link) => (
+            <motion.a
+              key={link.href}
+              href={link.href}
+              className="hover:text-foreground theme-transition-text"
+              whileHover={{ y: -2 }}
+              whileTap={{ y: 0 }}
+            >
+              {link.label}
+            </motion.a>
+          ))}
+        </nav>
+        <div className="hidden md:flex items-center gap-4">
+          <motion.a
+            href="https://x.com/tmtennisx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-full hover:bg-muted theme-transition-bg"
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <XIcon className="h-5 w-5 text-muted-foreground hover:text-foreground theme-transition-text" />
+          </motion.a>
+          <div className="p-2 rounded-full bg-muted/50 cursor-not-allowed opacity-50" title="Dark mode (locked for media builder)">
+            <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            </svg>
           </div>
+          {!loading && (
+            user ? (
+              <UserDropdown />
+            ) : (
+              <LoginModal>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button variant="outline" className="theme-transition bg-transparent">
+                    Log In
+                  </Button>
+                </motion.div>
+              </LoginModal>
+            )
+          )}
+        </div>
+        <div className="md:hidden">
+          <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)} className="theme-transition">
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        </div>
+      </header>
 
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-16 left-0 right-0 z-40 bg-background border-b border-border p-4 md:hidden theme-transition-bg theme-transition-border"
+          >
+            <nav className="flex flex-col gap-4">
+              {navLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-lg font-medium text-muted-foreground hover:text-foreground theme-transition-text"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ))}
+              <div className="border-t border-border pt-4 flex flex-col gap-4 theme-transition-border">
+                <a
+                  href="https://x.com/tmtennisx"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-foreground theme-transition-text"
+                >
+                  <XIcon className="h-5 w-5" />
+                  Follow on X
+                </a>
+                {!loading && (
+                  user ? (
+                    <div className="flex items-center justify-between">
+                      <UserDropdown />
+                      <div className="mx-4">
+                        <div className="p-2 rounded-full bg-muted/50 cursor-not-allowed opacity-50" title="Dark mode (locked)">
+                          <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <LoginModal>
+                      <Button variant="outline" className="theme-transition bg-transparent">
+                        Log In
+                      </Button>
+                    </LoginModal>
+                  )
+                )}
+                {!user && (
+                  <div className="mx-auto">
+                    <div className="p-2 rounded-full bg-muted/50 cursor-not-allowed opacity-50" title="Dark mode (locked)">
+                      <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                      </svg>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Page Title */}
+      <div className="container mx-auto px-4 pt-20 pb-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-none mb-2">
+            <span className="text-foreground">media</span>
+            <span className="text-primary"> builder</span>
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Create stunning tennis player statistics cards and visual content
+          </p>
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="container mx-auto px-4 pb-8">
+        <div className="max-w-6xl mx-auto">
           {/* Two Column Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             {/* Left Column - Controls */}
