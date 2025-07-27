@@ -1501,7 +1501,7 @@ export default function MediaBuilderPage() {
 
             {/* Right Column - Stats Card */}
             <div className="flex justify-center lg:justify-end">
-              {(playerStats || isCustomMode) && (
+              {(playerStats || isCustomMode) ? (
                 <div 
                   ref={cardRef} 
                   className={`w-[800px] h-[450px] ${currentTheme.background} rounded-3xl overflow-hidden relative`}
@@ -1859,6 +1859,21 @@ export default function MediaBuilderPage() {
                     </div>
                   </div>
                 </div>
+              ) : (
+                /* Empty State in Right Column */
+                !isLoading && (
+                  <Card className="bg-card border-border w-[800px] h-[450px] flex items-center justify-center">
+                    <CardContent className="text-center py-12">
+                      <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-card-foreground mb-2">
+                        No Data Loaded
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        Upload a CSV file or load sample data to get started.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )
               )}
             </div>
           </div>
@@ -1869,21 +1884,6 @@ export default function MediaBuilderPage() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
               <p className="text-muted-foreground">Processing data...</p>
             </div>
-          )}
-
-          {/* Empty State */}
-          {!playerStats && !isLoading && !isCustomMode && (
-            <Card className="bg-card border-border">
-              <CardContent className="text-center py-12">
-                <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-card-foreground mb-2">
-                  No Data Loaded
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  Upload a CSV file or load sample data to get started.
-                </p>
-              </CardContent>
-            </Card>
           )}
         </div>
       </div>
