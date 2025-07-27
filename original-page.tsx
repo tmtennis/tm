@@ -10,8 +10,6 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { LoginModal } from "@/components/login-modal"
 import { UserDropdown } from "@/components/user-dropdown"
 import { useAuth } from "@/contexts/auth-context"
-import MatchCard from "@/components/MatchCard"
-import "@/styles/stat-cards.css"
 
 // X.com Icon Component
 const XIcon = ({ className }: { className?: string }) => (
@@ -100,7 +98,6 @@ export default function MediaBuilderPage() {
   const [isExporting, setIsExporting] = useState(false)
   const [customPlayerImage, setCustomPlayerImage] = useState<string | null>(null)
   const [isCustomMode, setIsCustomMode] = useState(false)
-  const [cardType, setCardType] = useState<'sinner' | 'alt' | 'blank'>('sinner')
   const [is2024Era, setIs2024Era] = useState(false)
   const [formKey, setFormKey] = useState(0) // Add key to force re-render
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -591,393 +588,6 @@ export default function MediaBuilderPage() {
     return isWin ? 'text-green-500' : 'text-red-500'
   }
 
-  // Flexible card rendering system
-  const renderCardByType = () => {
-    switch (cardType) {
-      case 'sinner':
-        return renderSinnerCard()
-      case 'alt':
-        return <MatchCard ref={cardRef} />
-      case 'blank':
-        return renderBlankCard()
-      default:
-        return renderSinnerCard()
-    }
-  }
-
-  const renderBlankCard = () => (
-    <div 
-      ref={cardRef}
-      className="stat-card bg-gradient-to-br from-gray-800 to-slate-900 flex items-center justify-center"
-    >
-      <div className="text-center text-white">
-        <div className="text-6xl font-bold mb-4 text-gray-400">?</div>
-        <h3 className="text-xl font-semibold mb-2">Blank Card</h3>
-        <p className="text-gray-400">Future card layout placeholder</p>
-      </div>
-    </div>
-  )
-
-  const renderSinnerCard = () => (
-    <div 
-      ref={cardRef} 
-      className={`w-[800px] h-[450px] ${currentTheme.background} rounded-3xl overflow-hidden relative`}
-      style={{ aspectRatio: '16/9' }}
-    >
-      {/* Hero Section with Player Image */}
-      <div className="relative h-full">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0">
-          <img 
-            src={customPlayerImage || (
-              isCustomMode 
-                ? (customContent.playerName.toLowerCase().includes('bublik') ? '/bublik.png' : '/placeholder-user.jpg')
-                : (playerStats?.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')
-            )} 
-            alt={isCustomMode ? customContent.playerName : playerStats?.playerName}
-            className="w-full h-full object-cover opacity-25"
-          />
-          <div className={`absolute inset-0 ${
-            currentTheme.id === 'default' ? 'bg-gradient-to-r from-black/90 via-black/70 to-black/50' :
-            currentTheme.id === 'tennis-green' ? 'bg-gradient-to-r from-green-900/90 via-green-800/70 to-emerald-900/50' :
-            currentTheme.id === 'royal-blue' ? 'bg-gradient-to-r from-blue-900/90 via-blue-800/70 to-indigo-900/50' :
-            currentTheme.id === 'sunset' ? 'bg-gradient-to-r from-orange-900/90 via-red-800/70 to-pink-900/50' :
-            'bg-gradient-to-r from-gray-900/90 via-gray-800/70 to-slate-900/50'
-          }`}></div>
-        </div>
-
-        {/* Content Overlay */}
-        <div className="relative z-10 p-8 h-full flex flex-col justify-between">
-          {/* Top Section - Player Info */}
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              <div className={`w-20 h-20 rounded-full overflow-hidden border-4 ${currentTheme.border} shadow-2xl`}>
-                <img 
-                  src={customPlayerImage || (
-                    isCustomMode 
-                      ? (customContent.playerName.toLowerCase().includes('bublik') ? '/bublik.png' : '/placeholder-user.jpg')
-                      : (playerStats?.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')
-                  )} 
-                  alt={isCustomMode ? customContent.playerName : playerStats?.playerName}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <h1 
-                  className="text-2xl font-bold mb-1"
-                  style={{ 
-                    color: isCustomMode ? textStyles.primaryColor : 'inherit'
-                  }}
-                >
-                  {isCustomMode ? customContent.playerName : playerStats?.playerName}
-                </h1>
-                <div 
-                  className="text-lg font-semibold"
-                  style={{ 
-                    color: isCustomMode ? textStyles.accentColor : 'inherit'
-                  }}
-                >
-                  {isCustomMode ? customContent.atpRank : `ATP Rank #${playerStats?.currentRank}`}
-                </div>
-                <div 
-                  className={`text-sm`}
-                  style={{ 
-                    color: isCustomMode ? textStyles.secondaryColor : 'inherit'
-                  }}
-                >
-                  {isCustomMode ? customContent.season : 
-                 is2024Era ? '2024 Season' : '2025 Season'}
-                </div>
-              </div>
-            </div>
-            
-            {/* Win Percentage Highlight */}
-            <div className="text-right">
-              <div 
-                className={`text-4xl font-bold mb-1`}
-                style={{ 
-                  color: isCustomMode ? textStyles.accentColor : 'inherit'
-                }}
-              >
-                {isCustomMode ? customContent.winRate : `${playerStats?.winPercentage.toFixed(0)}%`}
-              </div>
-              <div 
-                className={`text-xs uppercase tracking-wide`}
-                style={{ 
-                  color: isCustomMode ? textStyles.secondaryColor : 'inherit'
-                }}
-              >
-                {isCustomMode ? customContent.winRateLabel : "Win Rate"}
-              </div>
-            </div>
-          </div>
-
-          {/* Middle Section - Stats */}
-          <div className="space-y-4">
-            {/* Overall Record */}
-            <div className="flex justify-between items-center">
-              <div>
-                <div 
-                  className="text-xl font-bold"
-                  style={{ 
-                    color: isCustomMode ? textStyles.primaryColor : 'inherit'
-                  }}
-                >
-                  {isCustomMode ? customContent.overallRecord : `${playerStats?.wins}-${playerStats?.losses}`}
-                </div>
-                <div 
-                  className={`text-xs uppercase`}
-                  style={{ 
-                    color: isCustomMode ? textStyles.secondaryColor : 'inherit'
-                  }}
-                >
-                  {isCustomMode ? customContent.overallRecordLabel : "Overall Record"}
-                </div>
-              </div>
-              <div>
-                <div 
-                  className="text-xl font-bold"
-                  style={{ 
-                    color: isCustomMode ? textStyles.primaryColor : 'inherit'
-                  }}
-                >
-                  {isCustomMode ? customContent.totalMatches : playerStats?.totalMatches}
-                </div>
-                <div 
-                  className={`text-xs uppercase`}
-                  style={{ 
-                    color: isCustomMode ? textStyles.secondaryColor : 'inherit'
-                  }}
-                >
-                  {isCustomMode ? customContent.matchesLabel : "Matches"}
-                </div>
-              </div>
-            </div>
-
-            {/* Surface Records */}
-            <div className="grid grid-cols-3 gap-3">
-              {isCustomMode ? (
-                <>
-                  <div className="text-center">
-                    <div 
-                      className={`text-sm font-bold`}
-                      style={{ 
-                        color: textStyles.primaryColor
-                      }}
-                    >
-                      {customContent.clayRecord}
-                    </div>
-                    <div 
-                      className={`text-xs`}
-                      style={{ 
-                        color: textStyles.secondaryColor
-                      }}
-                    >
-                      {customContent.clayLabel}
-                    </div>
-                    <div 
-                      className={`text-xs`}
-                      style={{ 
-                        color: textStyles.accentColor
-                      }}
-                    >
-                      {customContent.clayPercentage}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div 
-                      className={`text-sm font-bold`}
-                      style={{ 
-                        color: textStyles.primaryColor
-                      }}
-                    >
-                      {customContent.grassRecord}
-                    </div>
-                    <div 
-                      className={`text-xs`}
-                      style={{ 
-                        color: textStyles.secondaryColor
-                      }}
-                    >
-                      {customContent.grassLabel}
-                    </div>
-                    <div 
-                      className={`text-xs`}
-                      style={{ 
-                        color: textStyles.accentColor
-                      }}
-                    >
-                      {customContent.grassPercentage}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div 
-                      className={`text-sm font-bold`}
-                      style={{ 
-                        color: textStyles.primaryColor
-                      }}
-                    >
-                      {customContent.hardRecord}
-                    </div>
-                    <div 
-                      className={`text-xs`}
-                      style={{ 
-                        color: textStyles.secondaryColor
-                      }}
-                    >
-                      {customContent.hardLabel}
-                    </div>
-                    <div 
-                      className={`text-xs`}
-                      style={{ 
-                        color: textStyles.accentColor
-                      }}
-                    >
-                      {customContent.hardPercentage}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                playerStats && Object.entries(playerStats.surfaceRecords).map(([surface, record]) => (
-                  <div key={surface} className="text-center">
-                    <div className={`text-sm font-bold ${currentTheme.textPrimary}`}>
-                      {record.wins}-{record.losses}
-                    </div>
-                    <div className={`text-xs ${currentTheme.textSecondary}`}>
-                      {surface}
-                    </div>
-                    <div className={`text-xs ${currentTheme.accent}`}>
-                      {record.percentage.toFixed(0)}%
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Bottom Section - Recent Form */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h3 
-                className={`text-lg font-semibold`}
-                style={{ 
-                  color: isCustomMode ? textStyles.primaryColor : 'inherit'
-                }}
-              >
-                {isCustomMode ? customContent.recentFormTitle : 
-                 (is2024Era && !isCustomMode ? 'End of Season Form' : 'Recent Form')}
-              </h3>
-              <div className="flex gap-1">
-                {/* Show sample form in custom mode or real data */}
-                {isCustomMode ? (
-                  // Custom recent form results - only show non-empty ones
-                  customContent.recentFormResults
-                    .filter(result => result.trim() !== '')
-                    .map((result, index) => (
-                    <div
-                      key={index}
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                        result === 'W' 
-                          ? 'bg-green-500 text-white' 
-                          : result === 'L'
-                          ? 'bg-red-500 text-white'
-                          : 'bg-gray-500 text-white'
-                      }`}
-                    >
-                      {result}
-                    </div>
-                  ))
-                ) : (
-                  playerStats?.last6Matches.map((match, index) => (
-                    <div
-                      key={index}
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                        match.isWin 
-                          ? 'bg-green-500 text-white' 
-                          : 'bg-red-500 text-white'
-                      }`}
-                    >
-                      {getMatchResult(match)}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* 2024 Achievements / Latest Match Detail */}
-            <div className={`bg-white/10 backdrop-blur-sm rounded-xl p-3 border ${currentTheme.border}`}>
-              {(is2024Era && !isCustomMode) || isCustomMode ? (
-                /* 2024 Major Titles for Sinner or Custom Mode */
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div 
-                      className={`font-medium text-sm`}
-                      style={{ 
-                        color: isCustomMode ? textStyles.primaryColor : 'inherit'
-                      }}
-                    >
-                      {isCustomMode ? customContent.highlightsTitle : "2024 Season Highlights"}
-                    </div>
-                    <div 
-                      className={`text-xs ${currentTheme.accent}`}
-                    >
-                      {isCustomMode ? customContent.highlightsSubtext : "First Italian to win 2 Grand Slams in a year"}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="flex items-center gap-0.5" title="Grand Slams: Australian Open & US Open">
-                      {isCustomMode ? (
-                        // Render the selected number of trophy icons
-                        Array.from({ length: parseInt(customContent.grandSlamCount) || 0 }, (_, index) => (
-                          <span key={index}>{getTrophyIcon(customContent.trophyIcon)}</span>
-                        ))
-                      ) : (
-                        <>
-                          <Trophy className="h-3 w-3 text-blue-400" />
-                          <Trophy className="h-3 w-3 text-blue-400" />
-                        </>
-                      )}
-                      {(isCustomMode && parseInt(customContent.grandSlamCount) > 0) || (!isCustomMode) ? (
-                        <span 
-                          className={`text-xs ml-1`}
-                          style={{ 
-                            color: isCustomMode ? textStyles.secondaryColor : 'inherit'
-                          }}
-                        >
-                          {isCustomMode ? customContent.trophyLabel : "Grand Slams"}
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-
-            {/* Footer */}
-            <div className={`flex justify-between items-center mt-3 pt-3 border-t ${currentTheme.border}`}>
-              <div 
-                className={`text-xs`}
-                style={{ 
-                  color: isCustomMode ? textStyles.secondaryColor : 'inherit'
-                }}
-              >
-                {isCustomMode ? customContent.footerBrand : 'TennisMenace Analytics'}
-              </div>
-              <div 
-                className={`text-xs font-medium`}
-                style={{ 
-                  color: isCustomMode ? textStyles.accentColor : 'inherit'
-                }}
-              >
-                {isCustomMode ? customContent.footerHandle : '@TmTennisX'}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-
   const exportStatsCard = async () => {
     if (!cardRef.current || (!playerStats && !isCustomMode)) return
     
@@ -1414,34 +1024,6 @@ export default function MediaBuilderPage() {
                     </div>
                   ) : null}
 
-                  {/* Card Type Selector */}
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-foreground">Card Layout</h3>
-                    <div className="grid grid-cols-3 gap-2">
-                      <Button 
-                        onClick={() => setCardType('sinner')}
-                        variant={cardType === 'sinner' ? 'default' : 'outline'}
-                        className="text-xs h-8"
-                      >
-                        Season Card
-                      </Button>
-                      <Button 
-                        onClick={() => setCardType('alt')}
-                        variant={cardType === 'alt' ? 'default' : 'outline'}
-                        className="text-xs h-8"
-                      >
-                        Match Card
-                      </Button>
-                      <Button 
-                        onClick={() => setCardType('blank')}
-                        variant={cardType === 'blank' ? 'default' : 'outline'}
-                        className="text-xs h-8"
-                      >
-                        Blank
-                      </Button>
-                    </div>
-                  </div>
-
                   {/* Export Button */}
                   {(playerStats || isCustomMode) && (
                     <Button 
@@ -1857,8 +1439,364 @@ export default function MediaBuilderPage() {
 
             {/* Right Column - Stats Card */}
             <div className="flex justify-center lg:justify-end">
-              {(playerStats || isCustomMode || cardType !== 'sinner') ? (
-                renderCardByType()
+              {(playerStats || isCustomMode) ? (
+                <div 
+                  ref={cardRef} 
+                  className={`w-[800px] h-[450px] ${currentTheme.background} rounded-3xl overflow-hidden relative`}
+                  style={{ aspectRatio: '16/9' }}
+                >
+                  {/* Hero Section with Player Image */}
+                  <div className="relative h-full">
+                    {/* Background Image with Overlay */}
+                    <div className="absolute inset-0">
+                      <img 
+                        src={customPlayerImage || (
+                          isCustomMode 
+                            ? (customContent.playerName.toLowerCase().includes('bublik') ? '/bublik.png' : '/placeholder-user.jpg')
+                            : (playerStats?.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')
+                        )} 
+                        alt={isCustomMode ? customContent.playerName : playerStats?.playerName}
+                        className="w-full h-full object-cover opacity-25"
+                      />
+                      <div className={`absolute inset-0 ${
+                        currentTheme.id === 'default' ? 'bg-gradient-to-r from-black/90 via-black/70 to-black/50' :
+                        currentTheme.id === 'tennis-green' ? 'bg-gradient-to-r from-green-900/90 via-green-800/70 to-emerald-900/50' :
+                        currentTheme.id === 'royal-blue' ? 'bg-gradient-to-r from-blue-900/90 via-blue-800/70 to-indigo-900/50' :
+                        currentTheme.id === 'sunset' ? 'bg-gradient-to-r from-orange-900/90 via-red-800/70 to-pink-900/50' :
+                        'bg-gradient-to-r from-gray-900/90 via-gray-800/70 to-slate-900/50'
+                      }`}></div>
+                    </div>
+
+                    {/* Content Overlay */}
+                    <div className="relative z-10 p-8 h-full flex flex-col justify-between">
+                      {/* Top Section - Player Info */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-20 h-20 rounded-full overflow-hidden border-4 ${currentTheme.border} shadow-2xl`}>
+                            <img 
+                              src={customPlayerImage || (
+                                isCustomMode 
+                                  ? (customContent.playerName.toLowerCase().includes('bublik') ? '/bublik.png' : '/placeholder-user.jpg')
+                                  : (playerStats?.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')
+                              )} 
+                              alt={isCustomMode ? customContent.playerName : playerStats?.playerName}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <h1 
+                              className="text-2xl font-bold mb-1"
+                              style={{ 
+                                color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.playerName : playerStats?.playerName}
+                            </h1>
+                            <div 
+                              className="text-lg font-semibold"
+                              style={{ 
+                                color: isCustomMode ? textStyles.accentColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.atpRank : `ATP Rank #${playerStats?.currentRank}`}
+                            </div>
+                            <div 
+                              className={`text-sm`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.season : 
+                               is2024Era ? '2024 Season' : '2025 Season'}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Win Percentage Highlight */}
+                        <div className="text-right">
+                          <div 
+                            className={`text-4xl font-bold mb-1`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.accentColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.winRate : `${playerStats?.winPercentage.toFixed(0)}%`}
+                          </div>
+                          <div 
+                            className={`text-xs uppercase tracking-wide`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.winRateLabel : "Win Rate"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Middle Section - Stats */}
+                      <div className="space-y-4">
+                        {/* Overall Record */}
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <div 
+                              className="text-xl font-bold"
+                              style={{ 
+                                color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.overallRecord : `${playerStats?.wins}-${playerStats?.losses}`}
+                            </div>
+                            <div 
+                              className={`text-xs uppercase`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.overallRecordLabel : "Overall Record"}
+                            </div>
+                          </div>
+                          <div>
+                            <div 
+                              className="text-xl font-bold"
+                              style={{ 
+                                color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.totalMatches : playerStats?.totalMatches}
+                            </div>
+                            <div 
+                              className={`text-xs uppercase`}
+                              style={{ 
+                                color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                              }}
+                            >
+                              {isCustomMode ? customContent.matchesLabel : "Matches"}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Surface Records */}
+                        <div className="grid grid-cols-3 gap-3">
+                          {isCustomMode ? (
+                            <>
+                              <div className="text-center">
+                                <div 
+                                  className={`text-sm font-bold`}
+                                  style={{ 
+                                    color: textStyles.primaryColor
+                                  }}
+                                >
+                                  {customContent.clayRecord}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.secondaryColor
+                                  }}
+                                >
+                                  {customContent.clayLabel}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.accentColor
+                                  }}
+                                >
+                                  {customContent.clayPercentage}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <div 
+                                  className={`text-sm font-bold`}
+                                  style={{ 
+                                    color: textStyles.primaryColor
+                                  }}
+                                >
+                                  {customContent.grassRecord}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.secondaryColor
+                                  }}
+                                >
+                                  {customContent.grassLabel}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.accentColor
+                                  }}
+                                >
+                                  {customContent.grassPercentage}
+                                </div>
+                              </div>
+                              <div className="text-center">
+                                <div 
+                                  className={`text-sm font-bold`}
+                                  style={{ 
+                                    color: textStyles.primaryColor
+                                  }}
+                                >
+                                  {customContent.hardRecord}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.secondaryColor
+                                  }}
+                                >
+                                  {customContent.hardLabel}
+                                </div>
+                                <div 
+                                  className={`text-xs`}
+                                  style={{ 
+                                    color: textStyles.accentColor
+                                  }}
+                                >
+                                  {customContent.hardPercentage}
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            playerStats && Object.entries(playerStats.surfaceRecords).map(([surface, record]) => (
+                              <div key={surface} className="text-center">
+                                <div className={`text-sm font-bold ${currentTheme.textPrimary}`}>
+                                  {record.wins}-{record.losses}
+                                </div>
+                                <div className={`text-xs ${currentTheme.textSecondary}`}>
+                                  {surface}
+                                </div>
+                                <div className={`text-xs ${currentTheme.accent}`}>
+                                  {record.percentage.toFixed(0)}%
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Bottom Section - Recent Form */}
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 
+                            className={`text-lg font-semibold`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.recentFormTitle : 
+                             (is2024Era && !isCustomMode ? 'End of Season Form' : 'Recent Form')}
+                          </h3>
+                          <div className="flex gap-1">
+                            {/* Show sample form in custom mode or real data */}
+                            {isCustomMode ? (
+                              // Custom recent form results - only show non-empty ones
+                              customContent.recentFormResults
+                                .filter(result => result.trim() !== '')
+                                .map((result, index) => (
+                                <div
+                                  key={index}
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                    result === 'W' 
+                                      ? 'bg-green-500 text-white' 
+                                      : result === 'L'
+                                      ? 'bg-red-500 text-white'
+                                      : 'bg-gray-500 text-white'
+                                  }`}
+                                >
+                                  {result}
+                                </div>
+                              ))
+                            ) : (
+                              playerStats?.last6Matches.map((match, index) => (
+                                <div
+                                  key={index}
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                    match.isWin 
+                                      ? 'bg-green-500 text-white' 
+                                      : 'bg-red-500 text-white'
+                                  }`}
+                                >
+                                  {getMatchResult(match)}
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 2024 Achievements / Latest Match Detail */}
+                        <div className={`bg-white/10 backdrop-blur-sm rounded-xl p-3 border ${currentTheme.border}`}>
+                          {(is2024Era && !isCustomMode) || isCustomMode ? (
+                            /* 2024 Major Titles for Sinner or Custom Mode */
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div 
+                                  className={`font-medium text-sm`}
+                                  style={{ 
+                                    color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                                  }}
+                                >
+                                  {isCustomMode ? customContent.highlightsTitle : "2024 Season Highlights"}
+                                </div>
+                                <div 
+                                  className={`text-xs ${currentTheme.accent}`}
+                                >
+                                  {isCustomMode ? customContent.highlightsSubtext : "First Italian to win 2 Grand Slams in a year"}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-0.5" title="Grand Slams: Australian Open & US Open">
+                                  {isCustomMode ? (
+                                    // Render the selected number of trophy icons
+                                    Array.from({ length: parseInt(customContent.grandSlamCount) || 0 }, (_, index) => (
+                                      <span key={index}>{getTrophyIcon(customContent.trophyIcon)}</span>
+                                    ))
+                                  ) : (
+                                    <>
+                                      <Trophy className="h-3 w-3 text-blue-400" />
+                                      <Trophy className="h-3 w-3 text-blue-400" />
+                                    </>
+                                  )}
+                                  {(isCustomMode && parseInt(customContent.grandSlamCount) > 0) || (!isCustomMode) ? (
+                                    <span 
+                                      className={`text-xs ml-1`}
+                                      style={{ 
+                                        color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                                      }}
+                                    >
+                                      {isCustomMode ? customContent.trophyLabel : "Grand Slams"}
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </div>
+                          ) : null}
+                        </div>
+
+                        {/* Footer */}
+                        <div className={`flex justify-between items-center mt-3 pt-3 border-t ${currentTheme.border}`}>
+                          <div 
+                            className={`text-xs`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.footerBrand : 'TennisMenace Analytics'}
+                          </div>
+                          <div 
+                            className={`text-xs font-medium`}
+                            style={{ 
+                              color: isCustomMode ? textStyles.accentColor : 'inherit'
+                            }}
+                          >
+                            {isCustomMode ? customContent.footerHandle : '@TmTennisX'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ) : (
                 /* Empty State in Right Column */
                 !isLoading && (
