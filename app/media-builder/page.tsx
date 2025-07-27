@@ -100,10 +100,11 @@ export default function MediaBuilderPage() {
   const [isExporting, setIsExporting] = useState(false)
   const [customPlayerImage, setCustomPlayerImage] = useState<string | null>(null)
   const [isCustomMode, setIsCustomMode] = useState(false)
-  const [cardType, setCardType] = useState<'sinner' | 'alt' | 'blank'>('sinner')
+  const [cardType, setCardType] = useState<'sinner' | 'alt'>('sinner')
   const [is2024Era, setIs2024Era] = useState(false)
   const [formKey, setFormKey] = useState(0) // Add key to force re-render
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [hoveredField, setHoveredField] = useState<string | null>(null) // Track hovered form field
   const { user, loading } = useAuth()
 
   // Navigation links configuration
@@ -597,9 +598,11 @@ export default function MediaBuilderPage() {
       case 'sinner':
         return renderSinnerCard()
       case 'alt':
+        // In custom mode, force render season card instead of match card
+        if (isCustomMode) {
+          return renderSinnerCard()
+        }
         return <MatchCard ref={cardRef} />
-      case 'blank':
-        return renderBlankCard()
       default:
         return renderSinnerCard()
     }
@@ -664,7 +667,9 @@ export default function MediaBuilderPage() {
               </div>
               <div>
                 <h1 
-                  className="text-2xl font-bold mb-1"
+                  className={`text-2xl font-bold mb-1 transition-all duration-200 ${
+                    hoveredField === 'playerName' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
                   style={{ 
                     color: isCustomMode ? textStyles.primaryColor : 'inherit'
                   }}
@@ -672,7 +677,9 @@ export default function MediaBuilderPage() {
                   {isCustomMode ? customContent.playerName : playerStats?.playerName}
                 </h1>
                 <div 
-                  className="text-lg font-semibold"
+                  className={`text-lg font-semibold transition-all duration-200 ${
+                    hoveredField === 'atpRank' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
                   style={{ 
                     color: isCustomMode ? textStyles.accentColor : 'inherit'
                   }}
@@ -680,7 +687,9 @@ export default function MediaBuilderPage() {
                   {isCustomMode ? customContent.atpRank : `ATP Rank #${playerStats?.currentRank}`}
                 </div>
                 <div 
-                  className={`text-sm`}
+                  className={`text-sm transition-all duration-200 ${
+                    hoveredField === 'season' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
                   style={{ 
                     color: isCustomMode ? textStyles.secondaryColor : 'inherit'
                   }}
@@ -694,7 +703,9 @@ export default function MediaBuilderPage() {
             {/* Win Percentage Highlight */}
             <div className="text-right">
               <div 
-                className={`text-4xl font-bold mb-1`}
+                className={`text-4xl font-bold mb-1 transition-all duration-200 ${
+                  hoveredField === 'winRate' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
                 style={{ 
                   color: isCustomMode ? textStyles.accentColor : 'inherit'
                 }}
@@ -702,7 +713,9 @@ export default function MediaBuilderPage() {
                 {isCustomMode ? customContent.winRate : `${playerStats?.winPercentage.toFixed(0)}%`}
               </div>
               <div 
-                className={`text-xs uppercase tracking-wide`}
+                className={`text-xs uppercase tracking-wide transition-all duration-200 ${
+                  hoveredField === 'winRateLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
                 style={{ 
                   color: isCustomMode ? textStyles.secondaryColor : 'inherit'
                 }}
@@ -718,7 +731,9 @@ export default function MediaBuilderPage() {
             <div className="flex justify-between items-center">
               <div>
                 <div 
-                  className="text-xl font-bold"
+                  className={`text-xl font-bold transition-all duration-200 ${
+                    hoveredField === 'overallRecord' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
                   style={{ 
                     color: isCustomMode ? textStyles.primaryColor : 'inherit'
                   }}
@@ -736,7 +751,9 @@ export default function MediaBuilderPage() {
               </div>
               <div>
                 <div 
-                  className="text-xl font-bold"
+                  className={`text-xl font-bold transition-all duration-200 ${
+                    hoveredField === 'totalMatches' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
                   style={{ 
                     color: isCustomMode ? textStyles.primaryColor : 'inherit'
                   }}
@@ -760,7 +777,9 @@ export default function MediaBuilderPage() {
                 <>
                   <div className="text-center">
                     <div 
-                      className={`text-sm font-bold`}
+                      className={`text-sm font-bold transition-all duration-200 ${
+                        hoveredField === 'clayRecord' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.primaryColor
                       }}
@@ -768,7 +787,9 @@ export default function MediaBuilderPage() {
                       {customContent.clayRecord}
                     </div>
                     <div 
-                      className={`text-xs`}
+                      className={`text-xs transition-all duration-200 ${
+                        hoveredField === 'clayLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.secondaryColor
                       }}
@@ -776,7 +797,9 @@ export default function MediaBuilderPage() {
                       {customContent.clayLabel}
                     </div>
                     <div 
-                      className={`text-xs`}
+                      className={`text-xs transition-all duration-200 ${
+                        hoveredField === 'clayPercentage' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.accentColor
                       }}
@@ -786,7 +809,9 @@ export default function MediaBuilderPage() {
                   </div>
                   <div className="text-center">
                     <div 
-                      className={`text-sm font-bold`}
+                      className={`text-sm font-bold transition-all duration-200 ${
+                        hoveredField === 'grassRecord' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.primaryColor
                       }}
@@ -794,7 +819,9 @@ export default function MediaBuilderPage() {
                       {customContent.grassRecord}
                     </div>
                     <div 
-                      className={`text-xs`}
+                      className={`text-xs transition-all duration-200 ${
+                        hoveredField === 'grassLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.secondaryColor
                       }}
@@ -802,7 +829,9 @@ export default function MediaBuilderPage() {
                       {customContent.grassLabel}
                     </div>
                     <div 
-                      className={`text-xs`}
+                      className={`text-xs transition-all duration-200 ${
+                        hoveredField === 'grassPercentage' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.accentColor
                       }}
@@ -812,7 +841,9 @@ export default function MediaBuilderPage() {
                   </div>
                   <div className="text-center">
                     <div 
-                      className={`text-sm font-bold`}
+                      className={`text-sm font-bold transition-all duration-200 ${
+                        hoveredField === 'hardRecord' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.primaryColor
                       }}
@@ -820,7 +851,9 @@ export default function MediaBuilderPage() {
                       {customContent.hardRecord}
                     </div>
                     <div 
-                      className={`text-xs`}
+                      className={`text-xs transition-all duration-200 ${
+                        hoveredField === 'hardLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.secondaryColor
                       }}
@@ -828,7 +861,9 @@ export default function MediaBuilderPage() {
                       {customContent.hardLabel}
                     </div>
                     <div 
-                      className={`text-xs`}
+                      className={`text-xs transition-all duration-200 ${
+                        hoveredField === 'hardPercentage' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: textStyles.accentColor
                       }}
@@ -859,7 +894,9 @@ export default function MediaBuilderPage() {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 
-                className={`text-lg font-semibold`}
+                className={`text-lg font-semibold transition-all duration-200 ${
+                  hoveredField === 'recentFormTitle' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
                 style={{ 
                   color: isCustomMode ? textStyles.primaryColor : 'inherit'
                 }}
@@ -867,7 +904,9 @@ export default function MediaBuilderPage() {
                 {isCustomMode ? customContent.recentFormTitle : 
                  (is2024Era && !isCustomMode ? 'End of Season Form' : 'Recent Form')}
               </h3>
-              <div className="flex gap-1">
+              <div className={`flex gap-1 transition-all duration-200 ${
+                hoveredField === 'recentFormResults' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+              }`}>
                 {/* Show sample form in custom mode or real data */}
                 {isCustomMode ? (
                   // Custom recent form results - only show non-empty ones
@@ -911,7 +950,9 @@ export default function MediaBuilderPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <div 
-                      className={`font-medium text-sm`}
+                      className={`font-medium text-sm transition-all duration-200 ${
+                        hoveredField === 'highlightsTitle' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                       style={{ 
                         color: isCustomMode ? textStyles.primaryColor : 'inherit'
                       }}
@@ -919,7 +960,9 @@ export default function MediaBuilderPage() {
                       {isCustomMode ? customContent.highlightsTitle : "2024 Season Highlights"}
                     </div>
                     <div 
-                      className={`text-xs ${currentTheme.accent}`}
+                      className={`text-xs ${currentTheme.accent} transition-all duration-200 ${
+                        hoveredField === 'highlightsSubtext' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                      }`}
                     >
                       {isCustomMode ? customContent.highlightsSubtext : "First Italian to win 2 Grand Slams in a year"}
                     </div>
@@ -939,7 +982,9 @@ export default function MediaBuilderPage() {
                       )}
                       {(isCustomMode && parseInt(customContent.grandSlamCount) > 0) || (!isCustomMode) ? (
                         <span 
-                          className={`text-xs ml-1`}
+                          className={`text-xs ml-1 transition-all duration-200 ${
+                            hoveredField === 'trophyLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                          }`}
                           style={{ 
                             color: isCustomMode ? textStyles.secondaryColor : 'inherit'
                           }}
@@ -956,7 +1001,9 @@ export default function MediaBuilderPage() {
             {/* Footer */}
             <div className={`flex justify-between items-center mt-3 pt-3 border-t ${currentTheme.border}`}>
               <div 
-                className={`text-xs`}
+                className={`text-xs transition-all duration-200 ${
+                  hoveredField === 'footerBrand' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
                 style={{ 
                   color: isCustomMode ? textStyles.secondaryColor : 'inherit'
                 }}
@@ -964,7 +1011,9 @@ export default function MediaBuilderPage() {
                 {isCustomMode ? customContent.footerBrand : 'TennisMenace Analytics'}
               </div>
               <div 
-                className={`text-xs font-medium`}
+                className={`text-xs font-medium transition-all duration-200 ${
+                  hoveredField === 'footerHandle' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
                 style={{ 
                   color: isCustomMode ? textStyles.accentColor : 'inherit'
                 }}
@@ -1122,35 +1171,40 @@ export default function MediaBuilderPage() {
   const toggleCustomMode = () => {
     setIsCustomMode(!isCustomMode)
     if (!isCustomMode) {
-      // Always start with blank custom content when entering custom mode
+      // If currently on Match Card layout, force switch to Season Card
+      if (cardType === 'alt') {
+        setCardType('sinner')
+      }
+      
+      // Always start with logical placeholder content when entering custom mode
       setCustomContent({
-        playerName: "",
-        atpRank: "",
-        season: "",
-        winRate: "",
-        winRateLabel: "",
-        overallRecord: "",
-        totalMatches: "",
-        clayRecord: "",
-        clayPercentage: "",
-        grassRecord: "",
-        grassPercentage: "",
-        hardRecord: "",
-        hardPercentage: "",
-        highlightsTitle: "",
-        highlightsSubtext: "",
-        grandSlamCount: "",
-        trophyIcon: "",
-        trophyLabel: "",
-        footerBrand: "",
-        footerHandle: "",
-        recentFormTitle: "",
-        recentFormResults: ["", "", "", "", "", ""],
-        clayLabel: "",
-        grassLabel: "", 
-        hardLabel: "",
-        matchesLabel: "",
-        overallRecordLabel: ""
+        playerName: "Name",
+        atpRank: "Upper Left",
+        season: "Upper Left Subtext",
+        winRate: "Name Subtext",
+        winRateLabel: "NAME TEXT",
+        overallRecord: "Class Text",
+        totalMatches: "Class Text",
+        clayRecord: "Class Text",
+        clayPercentage: "Class Subtext",
+        grassRecord: "Class Text",
+        grassPercentage: "Class Subtext",
+        hardRecord: "Class Text",
+        hardPercentage: "Class Subtext",
+        highlightsTitle: "Highlight Title",
+        highlightsSubtext: "Highlight Subtext",
+        grandSlamCount: "2",
+        trophyIcon: "trophy",
+        trophyLabel: "Icon Text",
+        footerBrand: "Footer Left",
+        footerHandle: "Footer Right",
+        recentFormTitle: "Recent Form",
+        recentFormResults: ["W", "L", "", "", "", ""],
+        clayLabel: "Class 1",
+        grassLabel: "Class 2",
+        hardLabel: "Class 3",
+        matchesLabel: "Classes",
+        overallRecordLabel: "Classes"
       })
     }
   }
@@ -1375,18 +1429,21 @@ export default function MediaBuilderPage() {
                   
 
 
-                  {/* Custom Mode Toggle - Priority #2 */}
+                  {/* Custom Mode Toggle - Creative Design */}
                   <Button 
                     onClick={toggleCustomMode} 
-                    className="w-full justify-start text-white border transition-all duration-200"
+                    className="w-full justify-start text-white border-0 relative overflow-hidden transition-all duration-300 hover:scale-[1.02] group"
                     style={{ 
-                      background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
-                      borderColor: 'rgba(59, 130, 246, 0.3)',
-                      backdropFilter: 'blur(4px)'
+                      background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%)',
+                      boxShadow: '0 8px 32px rgba(102, 126, 234, 0.2)',
                     }}
                   >
-                    <Edit3 className="h-4 w-4 mr-2" />
-                    Enter Custom Mode
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <Edit3 className="h-5 w-5 mr-3 relative z-10" />
+                    <span className="relative z-10 font-semibold">Enter Custom Mode</span>
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 opacity-50 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    </div>
                   </Button>
 
                   {/* Upload Player Image - Priority #2 */}
@@ -1417,7 +1474,7 @@ export default function MediaBuilderPage() {
                   {/* Card Type Selector */}
                   <div className="space-y-2">
                     <h3 className="text-sm font-medium text-foreground">Card Layout</h3>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <Button 
                         onClick={() => setCardType('sinner')}
                         variant={cardType === 'sinner' ? 'default' : 'outline'}
@@ -1429,52 +1486,50 @@ export default function MediaBuilderPage() {
                         onClick={() => setCardType('alt')}
                         variant={cardType === 'alt' ? 'default' : 'outline'}
                         className="text-xs h-8"
+                        disabled={isCustomMode}
                       >
                         Match Card
-                      </Button>
-                      <Button 
-                        onClick={() => setCardType('blank')}
-                        variant={cardType === 'blank' ? 'default' : 'outline'}
-                        className="text-xs h-8"
-                      >
-                        Blank
                       </Button>
                     </div>
                   </div>
 
-                  {/* Export Button */}
+                  {/* Export Button - Creative Design */}
                   {(playerStats || isCustomMode) && (
                     <Button 
                       onClick={exportStatsCard}
                       disabled={isExporting}
-                      className="w-full justify-start text-white transition-all duration-200 disabled:opacity-50"
+                      className="w-full justify-center text-white border-0 relative overflow-hidden transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 group"
                       style={{ 
-                        background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
-                        borderColor: 'rgba(59, 130, 246, 0.3)',
-                        backdropFilter: 'blur(4px)'
+                        background: isExporting 
+                          ? 'linear-gradient(135deg, rgba(74, 222, 128, 0.7) 0%, rgba(34, 197, 94, 0.7) 100%)'
+                          : 'linear-gradient(135deg, rgba(245, 158, 11, 0.7) 0%, rgba(217, 119, 6, 0.7) 100%)',
+                        boxShadow: isExporting 
+                          ? '0 8px 32px rgba(74, 222, 128, 0.2)'
+                          : '0 8px 32px rgba(245, 158, 11, 0.2)',
                       }}
                     >
-                      <Download className="h-4 w-4 mr-2" />
-                      {isExporting ? 'Exporting...' : 'Export Stats Card'}
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      {isExporting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent mr-3"></div>
+                          <span className="font-semibold">Exporting...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download className="h-5 w-5 mr-3 relative z-10 group-hover:animate-bounce" />
+                          <span className="relative z-10 font-semibold">Export Stats Card</span>
+                          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-50 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
+                            <div className="flex space-x-1">
+                              <div className="w-1 h-1 bg-white rounded-full animate-pulse"></div>
+                              <div className="w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </Button>
                   )}
 
-
-                  
-                  {/* Load Sinner 2024 Data */}
-                  <Button 
-                    onClick={loadSinner2024Data}
-                    disabled={isLoading} 
-                    className="w-full justify-start text-white transition-all duration-200 disabled:opacity-50"
-                    style={{ 
-                      background: 'linear-gradient(to right, rgba(37, 99, 235, 0.2), rgba(6, 182, 212, 0.2))',
-                      borderColor: 'rgba(59, 130, 246, 0.3)',
-                      backdropFilter: 'blur(4px)'
-                    }}
-                  >
-                    <BarChart3 className="h-4 w-4 mr-2" />
-                    Load Sinner 2024 Data
-                  </Button>
                 </>
               ) : (
                 // Custom Mode Interface - Replaces all buttons
@@ -1503,6 +1558,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.playerName}
                         onChange={(e) => updateCustomContent('playerName', e.target.value)}
+                        onMouseEnter={() => setHoveredField('playerName')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Player Name"
                       />
@@ -1510,6 +1567,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.atpRank}
                         onChange={(e) => updateCustomContent('atpRank', e.target.value)}
+                        onMouseEnter={() => setHoveredField('atpRank')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="ATP Rank"
                       />
@@ -1517,6 +1576,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.season}
                         onChange={(e) => updateCustomContent('season', e.target.value)}
+                        onMouseEnter={() => setHoveredField('season')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Season"
                       />
@@ -1528,6 +1589,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.winRate}
                         onChange={(e) => updateCustomContent('winRate', e.target.value)}
+                        onMouseEnter={() => setHoveredField('winRate')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Win Rate"
                       />
@@ -1535,6 +1598,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.overallRecord}
                         onChange={(e) => updateCustomContent('overallRecord', e.target.value)}
+                        onMouseEnter={() => setHoveredField('overallRecord')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Overall Record"
                       />
@@ -1542,6 +1607,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.totalMatches}
                         onChange={(e) => updateCustomContent('totalMatches', e.target.value)}
+                        onMouseEnter={() => setHoveredField('totalMatches')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Total Matches"
                       />
@@ -1553,6 +1620,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.winRateLabel}
                         onChange={(e) => updateCustomContent('winRateLabel', e.target.value)}
+                        onMouseEnter={() => setHoveredField('winRateLabel')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Win Rate Label"
                       />
@@ -1564,6 +1633,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.clayRecord}
                         onChange={(e) => updateCustomContent('clayRecord', e.target.value)}
+                        onMouseEnter={() => setHoveredField('clayRecord')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Clay"
                       />
@@ -1571,6 +1642,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.clayPercentage}
                         onChange={(e) => updateCustomContent('clayPercentage', e.target.value)}
+                        onMouseEnter={() => setHoveredField('clayPercentage')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Clay %"
                       />
@@ -1578,6 +1651,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.grassRecord}
                         onChange={(e) => updateCustomContent('grassRecord', e.target.value)}
+                        onMouseEnter={() => setHoveredField('grassRecord')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Grass"
                       />
@@ -1585,6 +1660,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.grassPercentage}
                         onChange={(e) => updateCustomContent('grassPercentage', e.target.value)}
+                        onMouseEnter={() => setHoveredField('grassPercentage')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Grass %"
                       />
@@ -1592,6 +1669,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.hardRecord}
                         onChange={(e) => updateCustomContent('hardRecord', e.target.value)}
+                        onMouseEnter={() => setHoveredField('hardRecord')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Hard"
                       />
@@ -1599,6 +1678,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.hardPercentage}
                         onChange={(e) => updateCustomContent('hardPercentage', e.target.value)}
+                        onMouseEnter={() => setHoveredField('hardPercentage')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Hard %"
                       />
@@ -1610,6 +1691,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.clayLabel}
                         onChange={(e) => updateCustomContent('clayLabel', e.target.value)}
+                        onMouseEnter={() => setHoveredField('clayLabel')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Clay Label"
                       />
@@ -1617,6 +1700,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.grassLabel}
                         onChange={(e) => updateCustomContent('grassLabel', e.target.value)}
+                        onMouseEnter={() => setHoveredField('grassLabel')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Grass Label"
                       />
@@ -1624,6 +1709,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.hardLabel}
                         onChange={(e) => updateCustomContent('hardLabel', e.target.value)}
+                        onMouseEnter={() => setHoveredField('hardLabel')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Hard Label"
                       />
@@ -1631,6 +1718,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.matchesLabel}
                         onChange={(e) => updateCustomContent('matchesLabel', e.target.value)}
+                        onMouseEnter={() => setHoveredField('matchesLabel')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Matches Label"
                       />
@@ -1642,6 +1731,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.recentFormTitle}
                         onChange={(e) => updateCustomContent('recentFormTitle', e.target.value)}
+                        onMouseEnter={() => setHoveredField('recentFormTitle')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Form Title"
                       />
@@ -1655,6 +1746,8 @@ export default function MediaBuilderPage() {
                             newResults[index] = e.target.value
                             updateCustomContent('recentFormResults', newResults)
                           }}
+                          onMouseEnter={() => setHoveredField('recentFormResults')}
+                          onMouseLeave={() => setHoveredField(null)}
                           className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white text-center"
                           placeholder={index < 2 ? "W" : index < 4 ? "L" : "W"}
                           maxLength={1}
@@ -1668,6 +1761,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.highlightsTitle}
                         onChange={(e) => updateCustomContent('highlightsTitle', e.target.value)}
+                        onMouseEnter={() => setHoveredField('highlightsTitle')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Highlights Title"
                       />
@@ -1675,6 +1770,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.highlightsSubtext}
                         onChange={(e) => updateCustomContent('highlightsSubtext', e.target.value)}
+                        onMouseEnter={() => setHoveredField('highlightsSubtext')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Highlights Subtext"
                       />
@@ -1724,6 +1821,8 @@ export default function MediaBuilderPage() {
                           type="text"
                           value={customContent.trophyLabel}
                           onChange={(e) => updateCustomContent('trophyLabel', e.target.value)}
+                          onMouseEnter={() => setHoveredField('trophyLabel')}
+                          onMouseLeave={() => setHoveredField(null)}
                           className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                           placeholder="Trophy Label"
                         />
@@ -1736,6 +1835,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.footerBrand}
                         onChange={(e) => updateCustomContent('footerBrand', e.target.value)}
+                        onMouseEnter={() => setHoveredField('footerBrand')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Footer Brand"
                       />
@@ -1743,6 +1844,8 @@ export default function MediaBuilderPage() {
                         type="text"
                         value={customContent.footerHandle}
                         onChange={(e) => updateCustomContent('footerHandle', e.target.value)}
+                        onMouseEnter={() => setHoveredField('footerHandle')}
+                        onMouseLeave={() => setHoveredField(null)}
                         className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
                         placeholder="Footer Handle"
                       />
