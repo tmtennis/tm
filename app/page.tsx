@@ -5,12 +5,13 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowUpRight, Bot, CheckCircle, ChevronDown, Menu, X, Youtube, Instagram } from "lucide-react"
+import { ArrowUpRight, Bot, CheckCircle, ChevronDown, Menu, X, Youtube, Instagram, Star } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LoginModal } from "@/components/login-modal"
 import { UserDropdown } from "@/components/user-dropdown"
 import { useAuth } from "@/contexts/auth-context"
 import PlayerSearch from '@/components/PlayerSearch';
+import Link from "next/link"
 
 // X.com Icon Component
 const XIcon = ({ className }: { className?: string }) => (
@@ -580,13 +581,24 @@ export default function TennisMenacePage() {
                 </div>
               </div>
 
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button
-                  size="lg"
-                  className="bg-primary text-primary-foreground font-bold hover:bg-primary/90 theme-transition"
-                >
-                  Go Premium
-                </Button>
+              <motion.div 
+                whileHover={{ scale: 1.02 }} 
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              >
+                <Link href="/premium">
+                  <Button
+                    size="lg"
+                    className="group relative bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Star className="h-5 w-5" />
+                      <span>
+                        Unlock Premium Access
+                      </span>
+                    </div>
+                  </Button>
+                </Link>
               </motion.div>
             </div>
             <Card className="bg-card border-border theme-transition-bg theme-transition-border">
