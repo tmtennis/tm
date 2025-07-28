@@ -24,7 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="dark" themes={["light", "dark", "tennis"]}>
+        <ThemeProvider 
+          attribute="class" 
+          defaultTheme="dark" 
+          enableSystem={false}
+          themes={["light", "dark", "tennis"]}
+        >
           <AuthProvider>
             {children}
           </AuthProvider>

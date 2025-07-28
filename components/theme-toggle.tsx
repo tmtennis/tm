@@ -56,7 +56,7 @@ export function ThemeToggle() {
   return (
     <div className="flex items-center gap-1 rounded-full border border-border bg-background/50 p-1 theme-transition-bg theme-transition-border">
       {themes.map(({ name, icon: Icon, label }) => (
-        <motion.div key={name} className="relative">
+        <div key={name} className="relative">
           <Button
             variant="ghost"
             size="icon"
@@ -68,30 +68,10 @@ export function ThemeToggle() {
             onClick={() => handleThemeChange(name)}
             disabled={isAnimating}
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={theme === name ? "active" : "inactive"}
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Icon className="h-4 w-4" />
-              </motion.div>
-            </AnimatePresence>
+            <Icon className="h-4 w-4" />
             <span className="sr-only">{label}</span>
           </Button>
-
-          {/* Active indicator */}
-          {theme === name && (
-            <motion.div
-              layoutId="activeTheme"
-              className="absolute inset-0 rounded-full border-2 border-primary/50"
-              initial={false}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            />
-          )}
-        </motion.div>
+        </div>
       ))}
     </div>
   )

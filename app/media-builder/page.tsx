@@ -116,24 +116,7 @@ export default function MediaBuilderPage() {
     { href: "/#contact", label: "Contact" },
   ]
 
-  // Force dark mode for this page
-  useEffect(() => {
-    // Store the current theme
-    const currentTheme = document.documentElement.classList.contains('dark')
-    const storedTheme = localStorage.getItem('theme')
-    
-    // Force dark mode
-    document.documentElement.classList.add('dark')
-    document.documentElement.classList.remove('light')
-    
-    // Cleanup function to restore previous theme when leaving the page
-    return () => {
-      if (storedTheme === 'light' || (!storedTheme && !currentTheme)) {
-        document.documentElement.classList.remove('dark')
-        document.documentElement.classList.add('light')
-      }
-    }
-  }, [])
+
   
   const [customContent, setCustomContent] = useState<CustomContent>({
     playerName: "Jannik Sinner",
@@ -1310,11 +1293,7 @@ export default function MediaBuilderPage() {
           >
             <XIcon className="h-5 w-5 text-muted-foreground hover:text-foreground theme-transition-text" />
           </motion.a>
-          <div className="p-2 rounded-full bg-muted/50 cursor-not-allowed opacity-50" title="Dark mode (locked for media builder)">
-            <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-            </svg>
-          </div>
+          <ThemeToggle />
           {!loading && (
             user ? (
               <UserDropdown />
@@ -1371,11 +1350,7 @@ export default function MediaBuilderPage() {
                     <div className="flex items-center justify-between">
                       <UserDropdown />
                       <div className="mx-4">
-                        <div className="p-2 rounded-full bg-muted/50 cursor-not-allowed opacity-50" title="Dark mode (locked)">
-                          <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                          </svg>
-                        </div>
+                        <ThemeToggle />
                       </div>
                     </div>
                   ) : (
@@ -1388,11 +1363,7 @@ export default function MediaBuilderPage() {
                 )}
                 {!user && (
                   <div className="mx-auto">
-                    <div className="p-2 rounded-full bg-muted/50 cursor-not-allowed opacity-50" title="Dark mode (locked)">
-                      <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                      </svg>
-                    </div>
+                    <ThemeToggle />
                   </div>
                 )}
               </div>
