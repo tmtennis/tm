@@ -1440,57 +1440,60 @@ export default function MediaBuilderPage() {
       // When entering custom mode, set editing card based on current card type
       setCustomEditingCard(cardType === 'alt' ? 'match' : 'season')
       
-      // Always start with logical placeholder content when entering custom mode
+      // Load appropriate starting content when entering custom mode
       if (cardType === 'alt') {
-        // Match card placeholders
+        // Load French Open Final preset for match card
         setCustomMatchContent({
-          tournamentName: "Tournament Name",
-          date: "Match Date",
-          surface: "Surface",
-          surfaceLabel: "Surface Label",
-          player1Name: "Player 1",
-          player1Seed: "#1",
-          player2Name: "Player 2", 
-          player2Seed: "#2",
-          score: "Score Sets",
-          duration: "Duration",
-          matchPointsSaved: "MP Saved",
-          stat1: "Match Stat 1",
-          stat2: "Match Stat 2",
-          footerBrand: "Footer Left",
-          footerHandle: "Footer Right"
+          tournamentName: "French Open Final 2025",
+          date: "June 8, 2025",
+          surface: "Clay",
+          surfaceLabel: "Surface",
+          player1Name: "Carlos Alcaraz",
+          player1Seed: "#2",
+          player2Name: "Jannik Sinner", 
+          player2Seed: "#1",
+          score: "4-6 6-7(4) 6-4 7-6(3) 7-6(2)",
+          duration: "4h 19m",
+          matchPointsSaved: "3",
+          stat1: "Historic Clay Court Battle",
+          stat2: "Epic 5-set final on Philippe-Chatrier",
+          footerBrand: "TennisMenace Analytics",
+          footerHandle: "@TmTennisX"
         })
       } else {
-        // Season card placeholders
+        // Load Sinner 2024 preset for season card
         setCustomContent({
-          playerName: "Player Name",
-          atpRank: "Upper Left",
-          season: "Upper Left Subtext",
-          winRate: "Name Subtext",
-          winRateLabel: "NAME TEXT",
-          overallRecord: "Class Text",
-          totalMatches: "Class Text",
-          clayRecord: "Class Text",
-          clayPercentage: "Class Subtext",
-          grassRecord: "Class Text",
-          grassPercentage: "Class Subtext",
-          hardRecord: "Class Text",
-          hardPercentage: "Class Subtext",
-          highlightsTitle: "Highlight Title",
-          highlightsSubtext: "Highlight Subtext",
+          playerName: "Jannik Sinner",
+          atpRank: "#1",
+          season: "2024 Season",
+          winRate: "91%",
+          winRateLabel: "WIN RATE",
+          overallRecord: "73-7",
+          totalMatches: "80",
+          clayRecord: "15-3",
+          clayPercentage: "83%",
+          grassRecord: "7-1", 
+          grassPercentage: "88%",
+          hardRecord: "51-3",
+          hardPercentage: "94%",
+          highlightsTitle: "2024 Season Highlights",
+          highlightsSubtext: "First Italian to win 2 Grand Slams in a year",
           grandSlamCount: "2",
           trophyIcon: "trophy",
-          trophyLabel: "Icon Text",
-          footerBrand: "Footer Left",
-          footerHandle: "Footer Right",
-          recentFormTitle: "Recent Form",
-          recentFormResults: ["W", "L", "", "", "", ""],
-          clayLabel: "Class 1",
-          grassLabel: "Class 2",
-          hardLabel: "Class 3",
-          matchesLabel: "Classes",
-          overallRecordLabel: "Classes"
+          trophyLabel: "Grand Slams",
+          footerBrand: "TennisMenace Analytics",
+          footerHandle: "@TmTennisX",
+          recentFormTitle: "End of Season Form",
+          recentFormResults: ["W", "W", "W", "W", "W", "W"],
+          clayLabel: "Clay",
+          grassLabel: "Grass",
+          hardLabel: "Hard",
+          matchesLabel: "MATCHES",
+          overallRecordLabel: "OVERALL RECORD"
         })
+        
+        // Load Sinner 2024 image for season card
+        setSeasonCardImage('/sinner2024.png')
       }
     }
   }
