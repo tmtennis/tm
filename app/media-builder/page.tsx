@@ -85,6 +85,24 @@ interface CustomContent {
   overallRecordLabel: string
 }
 
+interface CustomMatchContent {
+  tournamentName: string
+  date: string
+  surface: string
+  surfaceLabel: string
+  player1Name: string
+  player1Seed: string
+  player2Name: string
+  player2Seed: string
+  score: string
+  duration: string
+  matchPointsSaved: string
+  stat1: string
+  stat2: string
+  footerBrand: string
+  footerHandle: string
+}
+
 interface TextStyles {
   surfaceSize: number
   footerSize: number
@@ -99,7 +117,10 @@ export default function MediaBuilderPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [customPlayerImage, setCustomPlayerImage] = useState<string | null>(null)
+  const [seasonCardImage, setSeasonCardImage] = useState<string | null>(null)
+  const [matchCardImage, setMatchCardImage] = useState<string | null>(null)
   const [isCustomMode, setIsCustomMode] = useState(false)
+  const [customEditingCard, setCustomEditingCard] = useState<'season' | 'match'>('season') // Track which card is being edited
   const [cardType, setCardType] = useState<'sinner' | 'alt'>('sinner')
   const [is2024Era, setIs2024Era] = useState(false)
   const [formKey, setFormKey] = useState(0) // Add key to force re-render
@@ -146,6 +167,24 @@ export default function MediaBuilderPage() {
     hardLabel: "Hard",
     matchesLabel: "MATCHES",
     overallRecordLabel: "OVERALL RECORD"
+  })
+
+  const [customMatchContent, setCustomMatchContent] = useState<CustomMatchContent>({
+    tournamentName: "French Open Final 2025",
+    date: "June 8, 2025",
+    surface: "Clay",
+    surfaceLabel: "Surface",
+    player1Name: "Carlos Alcaraz",
+    player1Seed: "#2",
+    player2Name: "Jannik Sinner",
+    player2Seed: "#1",
+    score: "4-6 6-7(4) 6-4 7-6(3) 7-6(2)",
+    duration: "4h 19m",
+    matchPointsSaved: "3",
+    stat1: "Historic Clay Court Battle",
+    stat2: "Epic 5-set final on Philippe-Chatrier",
+    footerBrand: "TennisMenace Analytics",
+    footerHandle: "@TmTennisX"
   })
   const [textStyles, setTextStyles] = useState<TextStyles>({
     surfaceSize: 1, // text-lg
@@ -552,7 +591,18 @@ export default function MediaBuilderPage() {
       const reader = new FileReader()
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string
-        setCustomPlayerImage(imageUrl)
+        
+        if (isCustomMode) {
+          // In custom mode, update the appropriate template's image
+          if (customEditingCard === 'season') {
+            setSeasonCardImage(imageUrl)
+          } else if (customEditingCard === 'match') {
+            setMatchCardImage(imageUrl)
+          }
+        } else {
+          // In normal mode, update the general custom player image
+          setCustomPlayerImage(imageUrl)
+        }
       }
       reader.readAsDataURL(file)
     }
@@ -581,11 +631,7 @@ export default function MediaBuilderPage() {
       case 'sinner':
         return renderSinnerCard()
       case 'alt':
-        // In custom mode, force render season card instead of match card
-        if (isCustomMode) {
-          return renderSinnerCard()
-        }
-        return <MatchCard ref={cardRef} />
+        return isCustomMode ? renderCustomMatchCard() : <MatchCard ref={cardRef} />
       default:
         return renderSinnerCard()
     }
@@ -615,7 +661,7 @@ export default function MediaBuilderPage() {
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img 
-            src={customPlayerImage || (
+            src={(isCustomMode ? seasonCardImage : customPlayerImage) || (
               isCustomMode 
                 ? (customContent.playerName.toLowerCase().includes('bublik') ? '/bublik.png' : '/placeholder-user.jpg')
                 : (playerStats?.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')
@@ -639,7 +685,7 @@ export default function MediaBuilderPage() {
             <div className="flex items-center gap-4">
               <div className={`w-20 h-20 rounded-full overflow-hidden border-4 ${currentTheme.border} shadow-2xl`}>
                 <img 
-                  src={customPlayerImage || (
+                  src={(isCustomMode ? seasonCardImage : customPlayerImage) || (
                     isCustomMode 
                       ? (customContent.playerName.toLowerCase().includes('bublik') ? '/bublik.png' : '/placeholder-user.jpg')
                       : (playerStats?.playerName.includes('Bublik') ? '/bublik.png' : '/placeholder-user.jpg')
@@ -1010,6 +1056,239 @@ export default function MediaBuilderPage() {
     </div>
   )
 
+  const renderCustomMatchCard = () => (
+    <div 
+      ref={cardRef}
+      className={`w-[800px] h-[450px] ${currentTheme.background} rounded-3xl overflow-hidden relative`}
+      style={{ aspectRatio: '16/9' }}
+    >
+      {/* Hero Section with Tournament Image - Exact Season Card Pattern */}
+      <div className="relative h-full">
+        {/* Background Image with Overlay - Exact Season Card Pattern */}
+        <div className="absolute inset-0">
+          <img 
+            src={matchCardImage || "/rg2025.png"}
+            alt="Tournament Background"
+            className="w-full h-full object-cover opacity-25"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/50"></div>
+        </div>
+
+        {/* Content Overlay - Exact Season Card Structure */}
+        <div className="relative z-10 p-8 h-full flex flex-col justify-between">
+          {/* Top Section - Tournament Info */}
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <div className={`w-28 h-28 rounded-xl overflow-hidden border-2 ${currentTheme.border} shadow-2xl`}>
+                <img 
+                  src={matchCardImage || "/rg2025.png"}
+                  alt="Tournament Logo"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center h-28">
+                <h1 
+                  className={`text-2xl font-bold mb-1 transition-all duration-200 ${
+                    hoveredField === 'tournamentName' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
+                  style={{ 
+                    color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                  }}
+                >
+                  {customMatchContent.tournamentName}
+                </h1>
+                <div 
+                  className={`text-lg font-semibold transition-all duration-200 ${
+                    hoveredField === 'date' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
+                  style={{ 
+                    color: isCustomMode ? textStyles.accentColor : 'inherit'
+                  }}
+                >
+                  {customMatchContent.date}
+                </div>
+              </div>
+            </div>
+            
+            {/* Surface Highlight */}
+            <div className="text-right flex flex-col justify-center h-28">
+              <div 
+                className={`text-4xl font-bold mb-1 transition-all duration-200 ${
+                  hoveredField === 'surface' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
+                style={{ 
+                  color: isCustomMode ? textStyles.accentColor : 'inherit'
+                }}
+              >
+                {customMatchContent.surface}
+              </div>
+              <div 
+                className={`text-xs uppercase tracking-wide transition-all duration-200 ${
+                  hoveredField === 'surfaceLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
+                style={{ 
+                  color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                }}
+              >
+                {customMatchContent.surfaceLabel}
+              </div>
+            </div>
+          </div>
+
+          {/* Middle Section - Match Details */}
+          <div className="space-y-4">
+            {/* Match Result */}
+            <div className="text-center">
+              <div 
+                className={`text-xl font-bold transition-all duration-200 ${
+                  hoveredField === 'matchResult' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
+                style={{ 
+                  color: isCustomMode ? textStyles.primaryColor : 'inherit'
+                }}
+              >
+                {customMatchContent.player1Name} ({customMatchContent.player1Seed}) def. {customMatchContent.player2Name} ({customMatchContent.player2Seed})
+              </div>
+            </div>
+
+            {/* Match Stats - Vertical List */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <div 
+                  className={`text-xs transition-all duration-200 ${
+                    hoveredField === 'scoreLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
+                  style={{ 
+                    color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                  }}
+                >
+                  Final Score
+                </div>
+                <div 
+                  className={`text-sm font-bold transition-all duration-200 ${
+                    hoveredField === 'score' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
+                  style={{ 
+                    color: isCustomMode ? textStyles.accentColor : 'inherit'
+                  }}
+                >
+                  {customMatchContent.score}
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div 
+                  className={`text-xs transition-all duration-200 ${
+                    hoveredField === 'durationLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
+                  style={{ 
+                    color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                  }}
+                >
+                  Duration
+                </div>
+                <div 
+                  className={`text-sm font-bold transition-all duration-200 ${
+                    hoveredField === 'duration' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
+                  style={{ 
+                    color: isCustomMode ? textStyles.accentColor : 'inherit'
+                  }}
+                >
+                  {customMatchContent.duration}
+                </div>
+              </div>
+              <div className="flex justify-between items-center">
+                <div 
+                  className={`text-xs transition-all duration-200 ${
+                    hoveredField === 'matchPointsLabel' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
+                  style={{ 
+                    color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                  }}
+                >
+                  Match Points Saved
+                </div>
+                <div 
+                  className={`text-sm font-bold transition-all duration-200 ${
+                    hoveredField === 'matchPointsSaved' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                  }`}
+                  style={{ 
+                    color: isCustomMode ? textStyles.accentColor : 'inherit'
+                  }}
+                >
+                  {customMatchContent.matchPointsSaved}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Section - Match Summary */}
+          <div>
+            {/* Match Summary */}
+            <div className={`bg-white/10 backdrop-blur-sm rounded-xl p-3 border ${currentTheme.border}`}>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4" style={{ color: textStyles.accentColor }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div 
+                    className={`text-xs transition-all duration-200 ${
+                      hoveredField === 'stat1' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                    }`}
+                    style={{ 
+                      color: isCustomMode ? textStyles.accentColor : 'inherit'
+                    }}
+                  >
+                    {customMatchContent.stat1}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4" style={{ color: textStyles.accentColor }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  <div 
+                    className={`text-xs transition-all duration-200 ${
+                      hoveredField === 'stat2' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                    }`}
+                    style={{ 
+                      color: isCustomMode ? textStyles.accentColor : 'inherit'
+                    }}
+                  >
+                    {customMatchContent.stat2}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className={`flex justify-between items-center mt-3 pt-3 border-t ${currentTheme.border}`}>
+              <div 
+                className={`text-xs transition-all duration-200 ${
+                  hoveredField === 'footerBrand' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
+                style={{ 
+                  color: isCustomMode ? textStyles.secondaryColor : 'inherit'
+                }}
+              >
+                {customMatchContent.footerBrand}
+              </div>
+              <div 
+                className={`text-xs font-medium transition-all duration-200 ${
+                  hoveredField === 'footerHandle' ? 'ring-2 ring-cyan-400 ring-opacity-60 rounded px-1' : ''
+                }`}
+                style={{ 
+                  color: isCustomMode ? textStyles.accentColor : 'inherit'
+                }}
+              >
+                {customMatchContent.footerHandle}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   const exportStatsCard = async () => {
     if (!cardRef.current || (!playerStats && !isCustomMode)) return
     
@@ -1081,6 +1360,8 @@ export default function MediaBuilderPage() {
       
       // Reset custom image
       setCustomPlayerImage(null)
+      setSeasonCardImage(null)
+      setMatchCardImage(null)
       
       // Force re-render by incrementing key
       setFormKey(prev => prev + 1)
@@ -1088,6 +1369,8 @@ export default function MediaBuilderPage() {
       // In normal mode, reset everything and reload sample data
       // Reset custom image
       setCustomPlayerImage(null)
+      setSeasonCardImage(null)
+      setMatchCardImage(null)
       
       // Reset text styles to defaults
       setTextStyles({
@@ -1154,46 +1437,70 @@ export default function MediaBuilderPage() {
   const toggleCustomMode = () => {
     setIsCustomMode(!isCustomMode)
     if (!isCustomMode) {
-      // If currently on Match Card layout, force switch to Season Card
-      if (cardType === 'alt') {
-        setCardType('sinner')
-      }
+      // When entering custom mode, set editing card based on current card type
+      setCustomEditingCard(cardType === 'alt' ? 'match' : 'season')
       
       // Always start with logical placeholder content when entering custom mode
-      setCustomContent({
-        playerName: "Name",
-        atpRank: "Upper Left",
-        season: "Upper Left Subtext",
-        winRate: "Name Subtext",
-        winRateLabel: "NAME TEXT",
-        overallRecord: "Class Text",
-        totalMatches: "Class Text",
-        clayRecord: "Class Text",
-        clayPercentage: "Class Subtext",
-        grassRecord: "Class Text",
-        grassPercentage: "Class Subtext",
-        hardRecord: "Class Text",
-        hardPercentage: "Class Subtext",
-        highlightsTitle: "Highlight Title",
-        highlightsSubtext: "Highlight Subtext",
-        grandSlamCount: "2",
-        trophyIcon: "trophy",
-        trophyLabel: "Icon Text",
-        footerBrand: "Footer Left",
-        footerHandle: "Footer Right",
-        recentFormTitle: "Recent Form",
-        recentFormResults: ["W", "L", "", "", "", ""],
-        clayLabel: "Class 1",
-        grassLabel: "Class 2",
-        hardLabel: "Class 3",
-        matchesLabel: "Classes",
-        overallRecordLabel: "Classes"
-      })
+      if (cardType === 'alt') {
+        // Match card placeholders
+        setCustomMatchContent({
+          tournamentName: "Tournament Name",
+          date: "Match Date",
+          surface: "Surface",
+          surfaceLabel: "Surface Label",
+          player1Name: "Player 1",
+          player1Seed: "#1",
+          player2Name: "Player 2", 
+          player2Seed: "#2",
+          score: "Score Sets",
+          duration: "Duration",
+          matchPointsSaved: "MP Saved",
+          stat1: "Match Stat 1",
+          stat2: "Match Stat 2",
+          footerBrand: "Footer Left",
+          footerHandle: "Footer Right"
+        })
+      } else {
+        // Season card placeholders
+        setCustomContent({
+          playerName: "Player Name",
+          atpRank: "Upper Left",
+          season: "Upper Left Subtext",
+          winRate: "Name Subtext",
+          winRateLabel: "NAME TEXT",
+          overallRecord: "Class Text",
+          totalMatches: "Class Text",
+          clayRecord: "Class Text",
+          clayPercentage: "Class Subtext",
+          grassRecord: "Class Text",
+          grassPercentage: "Class Subtext",
+          hardRecord: "Class Text",
+          hardPercentage: "Class Subtext",
+          highlightsTitle: "Highlight Title",
+          highlightsSubtext: "Highlight Subtext",
+          grandSlamCount: "2",
+          trophyIcon: "trophy",
+          trophyLabel: "Icon Text",
+          footerBrand: "Footer Left",
+          footerHandle: "Footer Right",
+          recentFormTitle: "Recent Form",
+          recentFormResults: ["W", "L", "", "", "", ""],
+          clayLabel: "Class 1",
+          grassLabel: "Class 2",
+          hardLabel: "Class 3",
+          matchesLabel: "Classes",
+          overallRecordLabel: "Classes"
+        })
+      }
     }
   }
 
   const updateCustomContent = (field: keyof CustomContent, value: string | string[]) => {
     setCustomContent(prev => ({ ...prev, [field]: value }))
+  }
+
+  const updateCustomMatchContent = (field: keyof CustomMatchContent, value: string) => {
+    setCustomMatchContent(prev => ({ ...prev, [field]: value }))
   }
 
   const updateTextStyles = (field: keyof TextStyles, value: number | string) => {
@@ -1256,6 +1563,17 @@ export default function MediaBuilderPage() {
         return <Trophy className="h-3 w-3 text-blue-400" />
     }
   }
+
+  // Effect to reset image when switching templates to avoid mismatched displays
+  useEffect(() => {
+    if (isCustomMode) {
+      if (customEditingCard === 'season') {
+        setMatchCardImage(null)
+      } else if (customEditingCard === 'match') {
+        setSeasonCardImage(null)
+      }
+    }
+  }, [customEditingCard, isCustomMode])
 
   return (
     <div className="min-h-screen font-sans">
@@ -1457,7 +1775,6 @@ export default function MediaBuilderPage() {
                         onClick={() => setCardType('alt')}
                         variant={cardType === 'alt' ? 'default' : 'outline'}
                         className="text-xs h-8"
-                        disabled={isCustomMode}
                       >
                         Match Card
                       </Button>
@@ -1521,8 +1838,37 @@ export default function MediaBuilderPage() {
                     </div>
                   </div>
 
-                  {/* Content Editing */}
-                  <div key={formKey} className="space-y-1.5">
+                  {/* Template Selector - Switch between Season Card and Match Card editing */}
+                  <div className="space-y-1.5">
+                    <h4 className="text-xs font-medium text-gray-400">Edit Template</h4>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <Button 
+                        onClick={() => {
+                          setCustomEditingCard('season')
+                          setCardType('sinner')
+                        }}
+                        variant={customEditingCard === 'season' ? 'default' : 'outline'}
+                        className="text-xs h-7"
+                      >
+                        Season Card
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          setCustomEditingCard('match')
+                          setCardType('alt')
+                        }}
+                        variant={customEditingCard === 'match' ? 'default' : 'outline'}
+                        className="text-xs h-7"
+                      >
+                        Match Card
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Content Editing - Show different forms based on selected template */}
+                  {customEditingCard === 'season' ? (
+                    // Season Card editing interface (existing)
+                    <div key={formKey} className="space-y-1.5">
                     {/* Main Info - 3 columns */}
                     <div className="grid grid-cols-3 gap-1.5">
                       <input
@@ -1822,6 +2168,169 @@ export default function MediaBuilderPage() {
                       />
                     </div>
                   </div>
+                  ) : (
+                    // Match Card editing interface
+                    <div key={`match-${formKey}`} className="space-y-1.5">
+                      {/* Tournament Info - 2 columns */}
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <input
+                          type="text"
+                          value={customMatchContent.tournamentName}
+                          onChange={(e) => updateCustomMatchContent('tournamentName', e.target.value)}
+                          onMouseEnter={() => setHoveredField('tournamentName')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Tournament Name"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.date}
+                          onChange={(e) => updateCustomMatchContent('date', e.target.value)}
+                          onMouseEnter={() => setHoveredField('date')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Match Date"
+                        />
+                      </div>
+
+                      {/* Surface Info - 2 columns */}
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <input
+                          type="text"
+                          value={customMatchContent.surface}
+                          onChange={(e) => updateCustomMatchContent('surface', e.target.value)}
+                          onMouseEnter={() => setHoveredField('surface')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Surface"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.surfaceLabel}
+                          onChange={(e) => updateCustomMatchContent('surfaceLabel', e.target.value)}
+                          onMouseEnter={() => setHoveredField('surfaceLabel')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Surface Label"
+                        />
+                      </div>
+
+                      {/* Players - 4 columns */}
+                      <div className="grid grid-cols-4 gap-1">
+                        <input
+                          type="text"
+                          value={customMatchContent.player1Name}
+                          onChange={(e) => updateCustomMatchContent('player1Name', e.target.value)}
+                          onMouseEnter={() => setHoveredField('player1Name')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Player 1"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.player1Seed}
+                          onChange={(e) => updateCustomMatchContent('player1Seed', e.target.value)}
+                          onMouseEnter={() => setHoveredField('player1Seed')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="#1"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.player2Name}
+                          onChange={(e) => updateCustomMatchContent('player2Name', e.target.value)}
+                          onMouseEnter={() => setHoveredField('player2Name')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Player 2"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.player2Seed}
+                          onChange={(e) => updateCustomMatchContent('player2Seed', e.target.value)}
+                          onMouseEnter={() => setHoveredField('player2Seed')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-1.5 py-0.5 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="#2"
+                        />
+                      </div>
+
+                      {/* Match Stats - 3 columns */}
+                      <div className="grid grid-cols-3 gap-1.5">
+                        <input
+                          type="text"
+                          value={customMatchContent.score}
+                          onChange={(e) => updateCustomMatchContent('score', e.target.value)}
+                          onMouseEnter={() => setHoveredField('score')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Final Score"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.duration}
+                          onChange={(e) => updateCustomMatchContent('duration', e.target.value)}
+                          onMouseEnter={() => setHoveredField('duration')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Duration"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.matchPointsSaved}
+                          onChange={(e) => updateCustomMatchContent('matchPointsSaved', e.target.value)}
+                          onMouseEnter={() => setHoveredField('matchPointsSaved')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="MP Saved"
+                        />
+                      </div>
+
+                      {/* Match Stats Description - 2 columns */}
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <input
+                          type="text"
+                          value={customMatchContent.stat1}
+                          onChange={(e) => updateCustomMatchContent('stat1', e.target.value)}
+                          onMouseEnter={() => setHoveredField('stat1')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Match Stat 1"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.stat2}
+                          onChange={(e) => updateCustomMatchContent('stat2', e.target.value)}
+                          onMouseEnter={() => setHoveredField('stat2')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Match Stat 2"
+                        />
+                      </div>
+
+                      {/* Footer - 2 columns */}
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <input
+                          type="text"
+                          value={customMatchContent.footerBrand}
+                          onChange={(e) => updateCustomMatchContent('footerBrand', e.target.value)}
+                          onMouseEnter={() => setHoveredField('footerBrand')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Footer Brand"
+                        />
+                        <input
+                          type="text"
+                          value={customMatchContent.footerHandle}
+                          onChange={(e) => updateCustomMatchContent('footerHandle', e.target.value)}
+                          onMouseEnter={() => setHoveredField('footerHandle')}
+                          onMouseLeave={() => setHoveredField(null)}
+                          className="w-full px-2 py-1 rounded bg-gray-800 border border-gray-700 focus:ring-1 focus:ring-green-500 focus:outline-none text-xs text-white"
+                          placeholder="Footer Handle"
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Compact Controls Section */}
                   <div className="space-y-2 border-t border-gray-700 pt-2">
@@ -1896,7 +2405,7 @@ export default function MediaBuilderPage() {
                           <div className="flex items-center justify-center h-6 rounded bg-gray-800 border border-gray-700 hover:bg-gray-700 transition-colors px-3">
                             <Image className="h-3 w-3 mr-1 text-gray-400" />
                             <span className="text-xs text-gray-300 whitespace-nowrap">
-                              {customPlayerImage ? 'Change' : 'Upload'}
+                              {(customEditingCard === 'season' ? seasonCardImage : matchCardImage) ? 'Change' : 'Upload'}
                             </span>
                           </div>
                         </label>
